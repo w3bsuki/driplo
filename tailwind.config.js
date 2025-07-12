@@ -1,5 +1,3 @@
-import { fontFamily } from 'tailwindcss/defaultTheme';
-
 /** @type {import('tailwindcss').Config} */
 export default {
 	darkMode: 'class',
@@ -54,10 +52,9 @@ export default {
 				sm: 'calc(var(--radius) - 4px)'
 			},
 			fontFamily: {
-				sans: [...fontFamily.sans]
+				sans: ['system-ui', '-apple-system', 'sans-serif']
 			}
 		}
 	},
 	plugins: []
 };
-

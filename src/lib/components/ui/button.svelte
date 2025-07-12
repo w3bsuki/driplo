@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { type Snippet } from 'svelte';
-	import { type HTMLButtonAttributes } from 'svelte/elements';
+	import type { HTMLButtonAttributes } from 'svelte/elements';
 	import { cva, type VariantProps } from 'class-variance-authority';
 	import { cn } from '$lib/utils';
 
@@ -31,8 +31,9 @@
 	);
 
 	type ButtonVariantProps = VariantProps<typeof buttonVariants>;
+	type ButtonElement = HTMLButtonElement;
 
-	interface ButtonProps extends HTMLButtonAttributes<HTMLButtonElement>, ButtonVariantProps {
+	interface ButtonProps extends HTMLButtonAttributes<ButtonElement>, ButtonVariantProps {
 		class?: string;
 		children: Snippet;
 	}
