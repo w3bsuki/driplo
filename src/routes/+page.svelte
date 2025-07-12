@@ -1,3 +1,7 @@
+<script lang="ts">
+	import { Button } from '$lib/components/ui';
+</script>
+
 <div class="container mx-auto px-4 py-8">
 	<h1 class="text-4xl font-bold text-primary mb-4">Welcome to Threadly</h1>
 	<p class="text-muted-foreground">
@@ -23,9 +27,14 @@
 				Tailwind CSS v4 installed
 			</li>
 			<li class="flex items-center">
-				<span class="w-4 h-4 bg-yellow-500 rounded-full mr-2"></span>
-				shadcn-svelte pending
+				<span class="w-4 h-4 bg-green-500 rounded-full mr-2"></span>
+				shadcn-svelte configured
 			</li>
 		</ul>
+		<div class="mt-6 flex gap-4">
+			<Button>Start Building</Button>
+			<Button variant="outline">View Documentation</Button>
+			<Button variant="ghost">Learn More</Button>
+		</div>
 	</div>
 </div>
