@@ -42,35 +42,10 @@ async function loadProfile(userId: string) {
 			.from('profiles')
 			.select('*')
 			.eq('id', userId)
-			.maybeSingle()
+			.single()
 		
 		if (error) throw error
-		
-		// If no profile exists, create one
-		if (!data) {
-			console.log('No profile found, creating one...')
-			const { data: userData } = await supabase.auth.getUser()
-			if (userData.user) {
-				const { data: newProfile, error: createError } = await supabase
-					.from('profiles')
-					.insert({
-						id: userId,
-						username: userData.user.user_metadata?.username || `user_${userId.slice(0, 8)}`,
-						full_name: userData.user.user_metadata?.full_name || null
-					})
-					.select()
-					.single()
-				
-				if (createError) {
-					console.error('Error creating profile:', createError)
-					profile.set(null)
-				} else {
-					profile.set(newProfile)
-				}
-			}
-		} else {
-			profile.set(data)
-		}
+		profile.set(data)
 	} catch (error) {
 		console.error('Error loading profile:', error)
 		profile.set(null)
@@ -99,28 +74,6 @@ export const auth = {
 		})
 		
 		if (error) throw error
-		
-		// Manually create profile since trigger is disabled
-		if (data.user) {
-			try {
-				const { error: profileError } = await supabase
-					.from('profiles')
-					.insert({
-						id: data.user.id,
-						username: username,
-						full_name: fullName
-					})
-				
-				if (profileError) {
-					console.error('Profile creation error:', profileError)
-					// Don't throw here - user is created, profile can be fixed later
-				}
-			} catch (profileError) {
-				console.error('Profile creation failed:', profileError)
-				// Don't throw here - user is created, profile can be fixed later
-			}
-		}
-		
 		return data
 	},
 	

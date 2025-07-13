@@ -33,9 +33,13 @@
 	type ButtonVariantProps = VariantProps<typeof buttonVariants>;
 	type ButtonElement = HTMLButtonElement;
 
-	interface ButtonProps extends HTMLButtonAttributes<ButtonElement>, ButtonVariantProps {
+	interface ButtonProps extends ButtonVariantProps {
 		class?: string;
+		type?: 'button' | 'submit' | 'reset';
+		disabled?: boolean;
 		children: Snippet;
+		onclick?: (e: MouseEvent) => void;
+		[key: string]: any;
 	}
 
 	let {
@@ -43,12 +47,14 @@
 		variant = 'default',
 		size = 'default',
 		type = 'button',
+		disabled = false,
 		children,
+		onclick,
 		...restProps
 	}: ButtonProps = $props();
 </script>
 
-<button {type} class={cn(buttonVariants({ variant, size, className }))} {...restProps}>
+<button {type} {disabled} {onclick} class={cn(buttonVariants({ variant, size, className }))} {...restProps}>
 	{@render children()}
 </button>
 

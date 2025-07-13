@@ -338,10 +338,10 @@ After running the SQL schema, configure authentication in your Supabase dashboar
 ### 1. Go to Authentication → Settings
 
 ### 2. Configure Site URLs
-- **Site URL:** `http://localhost:5173`
+- **Site URL:** `http://localhost:5190`
 - **Redirect URLs:** 
-  - `http://localhost:5173/auth/callback`
-  - `http://localhost:5173/**` (for development)
+  - `http://localhost:5190/auth/callback`
+  - `http://localhost:5190/**` (for development)
 
 ### 3. Enable Authentication Providers
 - ✅ **Email** (already enabled by default)
@@ -384,7 +384,7 @@ After running the SQL schema, configure authentication in your Supabase dashboar
 
 1. **Run the SQL schema** in Supabase SQL Editor
 2. **Configure authentication settings** as described above
-3. **Test the setup** by visiting `http://localhost:5180/login`
+3. **Test the setup** by visiting `http://localhost:5190/login`
 4. **Register a new user** to verify automatic profile creation
 5. **Ready to build** sell flow and user profiles!
 

@@ -49,7 +49,7 @@ A modern peer-to-peer fashion marketplace built with SvelteKit, Tailwind CSS, an
    ```bash
    pnpm dev
    ```
-   The app will be available at http://localhost:5180
+   The app will be available at http://localhost:5190
 
 ## 📁 Project Structure
 

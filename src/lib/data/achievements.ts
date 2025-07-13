@@ -1,4 +1,4 @@
-import type { AchievementDefinition } from '$lib/types/social'
+import type { AchievementDefinition } from '$lib/types/unified'
 
 export const ACHIEVEMENT_DEFINITIONS: Record<string, AchievementDefinition> = {
   first_sale: {

@@ -68,7 +68,7 @@
 		try {
 			if (isLiked) {
 				const { error } = await supabase
-					.from('listing_likes')
+					.from('favorites')
 					.delete()
 					.eq('user_id', $user.id)
 					.eq('listing_id', data.listing.id)
@@ -78,7 +78,7 @@
 				likeCount--
 			} else {
 				const { error } = await supabase
-					.from('listing_likes')
+					.from('favorites')
 					.insert({
 						user_id: $user.id,
 						listing_id: data.listing.id
@@ -143,7 +143,7 @@
 	onMount(async () => {
 		if ($user) {
 			const { data: like } = await supabase
-				.from('listing_likes')
+				.from('favorites')
 				.select('id')
 				.eq('user_id', $user.id)
 				.eq('listing_id', data.listing.id)

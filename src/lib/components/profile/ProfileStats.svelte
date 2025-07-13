@@ -1,15 +1,14 @@
 <script lang="ts">
 	import { Badge } from '$lib/components/ui/badge'
 	import { TrendingUp, Star, Clock, Package, Award, Eye, DollarSign, Shield } from 'lucide-svelte'
-	import type { EnhancedUserProfile, SellerMetrics } from '$lib/types/social'
+	import type { Profile } from '$lib/types/unified'
 	
 	interface Props {
-		profile: EnhancedUserProfile
-		metrics?: SellerMetrics
+		profile: Profile
 		showDetailedStats?: boolean
 	}
 	
-	let { profile, metrics, showDetailedStats = false }: Props = $props()
+	let { profile, showDetailedStats = false }: Props = $props()
 	
 	// Calculate seller performance indicators
 	const sellerPerformance = $derived({

@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { onMount } from 'svelte'
 	import { goto } from '$app/navigation'
 	import { user } from '$lib/stores/auth'
 	import { supabase } from '$lib/supabase'
@@ -7,52 +6,22 @@
 	import ImageUpload from '$lib/components/upload/ImageUpload.svelte'
 	import { Save, ArrowLeft, User, Image as ImageIcon } from 'lucide-svelte'
 	import { toast } from 'svelte-sonner'
+	import type { PageData } from './$types'
 
-	let profile = $state<any>({})
-	let loading = $state(true)
+	// Get page data from server
+	let { data }: { data: PageData } = $props()
+
+	let profile = $state(data.profile)
 	let saving = $state(false)
 	let uploadingAvatar = $state(false)
 	let uploadingCover = $state(false)
 
-	// Form fields
-	let fullName = $state('')
-	let username = $state('')
-	let bio = $state('')
-	let location = $state('')
-	let website = $state('')
-
-	onMount(async () => {
-		if (!$user) {
-			goto('/auth/login')
-			return
-		}
-
-		await loadProfile()
-	})
-
-	async function loadProfile() {
-		try {
-			const { data, error } = await supabase
-				.from('profiles')
-				.select('*')
-				.eq('id', $user?.id)
-				.single()
-
-			if (error) throw error
-
-			profile = data
-			fullName = data.full_name || ''
-			username = data.username || ''
-			bio = data.bio || ''
-			location = data.location || ''
-			website = data.website || ''
-		} catch (error) {
-			console.error('Error loading profile:', error)
-			toast.error('Failed to load profile')
-		} finally {
-			loading = false
-		}
-	}
+	// Form fields initialized from server data
+	let fullName = $state(data.profile.full_name || '')
+	let username = $state(data.profile.username || '')
+	let bio = $state(data.profile.bio || '')
+	let location = $state(data.profile.location || '')
+	let website = $state(data.profile.website || '')
 
 	async function handleAvatarUpload(event: CustomEvent<{ file: File; preview: string }>) {
 		uploadingAvatar = true
@@ -174,19 +143,6 @@
 		</div>
 	</div>
 
-	{#if loading}
-		<div class="container max-w-4xl mx-auto px-4 py-8">
-			<div class="animate-pulse space-y-6">
-				<div class="h-48 bg-muted rounded-lg"></div>
-				<div class="space-y-4">
-					<div class="h-4 bg-muted rounded w-1/4"></div>
-					<div class="h-10 bg-muted rounded"></div>
-					<div class="h-4 bg-muted rounded w-1/4"></div>
-					<div class="h-10 bg-muted rounded"></div>
-				</div>
-			</div>
-		</div>
-	{:else}
 		<div class="container max-w-4xl mx-auto px-4 py-8 space-y-8">
 			<!-- Cover Image -->
 			<div>
@@ -314,5 +270,4 @@
 				</Button>
 			</div>
 		</div>
-	{/if}
 </div>

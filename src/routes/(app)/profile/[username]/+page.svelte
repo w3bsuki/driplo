@@ -1,8 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/stores'
-	import { onMount } from 'svelte'
-	import { goto } from '$app/navigation'
-	import { auth, user as authUser } from '$lib/stores/auth'
+	import { user as authUser } from '$lib/stores/auth'
 	import { supabase } from '$lib/supabase'
 	import ProfileHeader from '$lib/components/profile/ProfileHeader.svelte'
 	import ProfileStats from '$lib/components/profile/ProfileStats.svelte'
@@ -11,115 +9,23 @@
 	import { Badge } from '$lib/components/ui/badge'
 	import { MessageCircle, Calendar, Package, Star } from 'lucide-svelte'
 	import { toast } from 'svelte-sonner'
-	// import type { EnhancedUserProfile, UserRating, Listing } from '$lib/types'
+	import type { PageData } from './$types'
 	
-	// State
-	let profile = $state<any | null>(null)
-	let listings = $state<any[]>([])
-	let reviews = $state<any[]>([])
-	let isFollowing = $state(false)
-	let loading = $state(true)
+	// Get page data from server
+	let { data }: { data: PageData } = $props()
+	
+	// State from server data
+	let profile = $state(data.profile)
+	let listings = $state(data.listings)
+	let reviews = $state(data.reviews)
+	let isFollowing = $state(data.isFollowing)
 	let activeTab = $state<'listings' | 'reviews' | 'about'>('listings')
 	
 	// Get username from URL (derived)
 	const username = $derived($page.params.username)
 	
 	// Check if viewing own profile (derived)
-	const isOwnProfile = $derived($authUser?.id === profile?.id)
-	
-	onMount(async () => {
-		await loadProfile()
-	})
-	
-	async function loadProfile() {
-		try {
-			loading = true
-			
-			// Load profile data (without achievements for now)
-			const { data: profileData, error: profileError } = await supabase
-				.from('profiles')
-				.select('*')
-				.eq('username', username)
-				.maybeSingle()
-			
-			if (profileError) {
-				console.error('Error loading profile:', profileError)
-				toast.error('Error loading profile')
-				goto('/')
-				return
-			}
-			
-			if (!profileData) {
-				console.error('Profile not found for username:', username)
-				toast.error('Profile not found')
-				goto('/')
-				return
-			}
-			
-			// Set profile with missing fields
-			profile = {
-				...profileData,
-				achievements: [],
-				cover_image_url: profileData.cover_url || '',
-				member_since: profileData.created_at,
-				seller_rating: 0,
-				seller_rating_count: 0,
-				response_time_hours: 24,
-				total_sales: 0,
-				verification_badges: []
-			}
-			
-			// Load user's listings
-			const { data: listingsData } = await supabase
-				.from('listings')
-				.select('*')
-				.eq('seller_id', profile.id)
-				.eq('status', 'active')
-				.order('created_at', { ascending: false })
-				.limit(12)
-			
-			listings = listingsData || []
-			
-			// Load reviews (commented out until ratings table exists)
-			// const { data: reviewsData } = await supabase
-			// 	.from('user_ratings')
-			// 	.select(`
-			// 		*,
-			// 		rater:rater_user_id(username, avatar_url, full_name),
-			// 		listing:listing_id(title, images)
-			// 	`)
-			// 	.eq('rated_user_id', profile.id)
-			// 	.eq('rating_type', 'seller')
-			// 	.order('created_at', { ascending: false })
-			// 	.limit(10)
-			
-			reviews = [] // reviewsData || []
-			
-			// Check if current user follows this profile
-			const currentUser = $authUser
-			if (currentUser && !isOwnProfile) {
-				const { data: followData } = await supabase
-					.from('user_follows')
-					.select('id')
-					.eq('follower_id', currentUser.id)
-					.eq('following_id', profile.id)
-					.single()
-				
-				isFollowing = !!followData
-			}
-			
-			// Track profile view (commented out until profile_views table exists)
-			// if (!isOwnProfile) {
-			// 	await trackProfileView()
-			// }
-			
-		} catch (error) {
-			console.error('Error loading profile:', error)
-			toast.error('Failed to load profile')
-		} finally {
-			loading = false
-		}
-	}
+	const isOwnProfile = $derived(data.isOwnProfile)
 	
 	// async function trackProfileView() {
 	// 	const currentUser = $authUser
@@ -215,11 +121,7 @@
 	<meta name="description" content="{profile?.bio || `${profile?.username}'s profile on Threadly marketplace`}" />
 </svelte:head>
 
-{#if loading}
-	<div class="min-h-screen flex items-center justify-center bg-gray-50">
-		<div class="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
-	</div>
-{:else if profile}
+{#if profile}
 	<div class="min-h-screen bg-gray-50">
 		<!-- Profile Header - Full Width on Mobile -->
 		<ProfileHeader 

@@ -52,6 +52,7 @@
 		"@supabase/supabase-js": "^2.50.5",
 		"@tanstack/svelte-query": "^5.83.0",
 		"@types/uuid": "^10.0.0",
+		"canvas-confetti": "^1.9.3",
 		"sharp": "^0.34.3",
 		"stripe": "^18.3.0",
 		"svelte-sonner": "^1.0.5",

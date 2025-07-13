@@ -104,18 +104,19 @@
 		const { data, error } = await supabase
 			.from('categories')
 			.select('*')
+			.is('parent_id', null)  // Only get main categories
 			.eq('is_active', true)
-			.order('name')
+			.order('display_order')
 		
 		if (error) {
 			console.error('Error loading categories:', error)
 			toast.error('Failed to load categories. We will add default categories for now.')
-			// Add default categories for testing
+			// Add default categories with proper UUIDs
 			categories = [
-				{ id: 'women', name: 'Women', icon: '👗', slug: 'women', is_active: true },
-				{ id: 'men', name: 'Men', icon: '👔', slug: 'men', is_active: true },
-				{ id: 'shoes', name: 'Shoes', icon: '👟', slug: 'shoes', is_active: true },
-				{ id: 'bags', name: 'Bags', icon: '👜', slug: 'bags', is_active: true }
+				{ id: '550e8400-e29b-41d4-a716-446655440001', name: 'Women', icon: '👗', slug: 'women', is_active: true },
+				{ id: '550e8400-e29b-41d4-a716-446655440002', name: 'Men', icon: '👔', slug: 'men', is_active: true },
+				{ id: '550e8400-e29b-41d4-a716-446655440005', name: 'Shoes', icon: '👟', slug: 'shoes', is_active: true },
+				{ id: '550e8400-e29b-41d4-a716-446655440004', name: 'Accessories', icon: '👜', slug: 'accessories', is_active: true }
 			] as any
 		} else {
 			categories = data || []
@@ -229,17 +230,36 @@
 				imageUrls = [`https://picsum.photos/400/600?random=${Date.now()}`]
 			}
 			
-			// Create listing - basic version first
+			// Generate slug from title
+			const generateSlug = (title: string) => {
+				return title
+					.toLowerCase()
+					.trim()
+					.replace(/[^\w\s-]/g, '') // Remove special chars
+					.replace(/\s+/g, '-') // Replace spaces with -
+					.replace(/-+/g, '-') // Replace multiple - with single -
+					.substring(0, 50) // Limit length
+					+ '-' + Date.now().toString(36) // Add unique suffix
+			}
+
+			// Create listing with all fields
 			const listingData: any = {
 				title: formData.title.trim(),
 				description: formData.description.trim(),
 				price: formData.price,
 				condition: formData.condition,
 				images: imageUrls,
-				location: formData.location.trim(),
+				location_city: formData.location.trim(),
 				seller_id: $user.id,
 				status: 'active',
-				category_id: formData.category_id || categories[0]?.id || null
+				slug: generateSlug(formData.title),
+				category_id: formData.category_id || null,
+				subcategory_id: formData.subcategory || null,
+				size: formData.size || null,
+				brand: formData.brand || null,
+				color: formData.color || null,
+				tags: formData.tags || [],
+				ships_worldwide: formData.shipping_type === 'worldwide'
 			}
 			
 			const { data, error } = await supabase
@@ -252,22 +272,23 @@
 			
 			toast.success('Listing created successfully!')
 			
-			// Track activity
-			await supabase.from('user_activities').insert({
-				user_id: $user.id,
-				activity_type: 'listed_item',
-				activity_data: {
-					listing_id: data.id,
-					title: data.title,
-					price: data.price,
-					image: imageUrls[0]
-				}
-			})
+			// Track activity - commented out until user_activities table exists
+			// await supabase.from('user_activities').insert({
+			// 	user_id: $user.id,
+			// 	activity_type: 'listed_item',
+			// 	activity_data: {
+			// 		listing_id: data.id,
+			// 		title: data.title,
+			// 		price: data.price,
+			// 		image: imageUrls[0]
+			// 	}
+			// })
 			
 			if (onSuccess) {
 				onSuccess(data.id)
 			} else {
-				goto(`/listings/${data.id}`)
+				// Redirect to success page
+				goto(`/sell/success?id=${data.id}`)
 			}
 			
 		} catch (error) {

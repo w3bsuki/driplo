@@ -2,12 +2,12 @@
 	import { Badge } from '$lib/components/ui/badge'
 	import { Button } from '$lib/components/ui'
 	import { Camera, MapPin, Calendar, ExternalLink, MessageCircle, UserPlus, UserMinus, Award, Star } from 'lucide-svelte'
-	import type { EnhancedUserProfile } from '$lib/types/social'
+	import type { Profile } from '$lib/types/unified'
 	import { getAchievementIcon, getAchievementColor } from '$lib/data/achievements'
 	import { auth } from '$lib/stores/auth'
 	
 	interface Props {
-		profile: EnhancedUserProfile
+		profile: Profile
 		isOwnProfile?: boolean
 		isFollowing?: boolean
 		onFollow?: () => void
@@ -27,11 +27,11 @@
 	// Calculate profile completion percentage
 	const completionScore = $derived(calculateCompletionScore(profile))
 	
-	function calculateCompletionScore(profile: EnhancedUserProfile): number {
+	function calculateCompletionScore(profile: Profile): number {
 		let score = 0
 		const fields = [
 			profile.avatar_url,
-			profile.cover_image_url,
+			profile.cover_url,
 			profile.bio,
 			profile.location,
 			profile.full_name,
@@ -63,9 +63,9 @@
 <div class="bg-white rounded-b-3xl shadow-sm overflow-hidden">
 	<!-- Cover Image with Orange Gradient -->
 	<div class="relative h-32 sm:h-40 md:h-48 bg-gradient-to-br from-orange-400 via-orange-500 to-red-500">
-		{#if profile.cover_image_url}
+		{#if profile.cover_url}
 			<img 
-				src={profile.cover_image_url} 
+				src={profile.cover_url} 
 				alt="Cover" 
 				class="w-full h-full object-cover opacity-90"
 			/>
