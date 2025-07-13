@@ -104,10 +104,7 @@ CREATE TABLE profile_views (
     profile_id UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL,
     viewer_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
     ip_address INET,
-    created_at TIMESTAMPTZ DEFAULT NOW(),
-    
-    -- Prevent spam views from same user
-    UNIQUE(profile_id, viewer_id, DATE(created_at))
+    created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
 -- =====================================================
@@ -152,6 +149,7 @@ CREATE INDEX idx_activities_type ON user_activities(activity_type);
 -- Profile views indexes
 CREATE INDEX idx_profile_views_profile ON profile_views(profile_id);
 CREATE INDEX idx_profile_views_date ON profile_views(created_at DESC);
+CREATE INDEX idx_profile_views_daily ON profile_views(profile_id, viewer_id, (created_at::date));
 
 -- =====================================================
 -- FUNCTIONS FOR RATING CALCULATIONS
