@@ -39,28 +39,62 @@
 	];
 </script>
 
-<section class="py-12 md:py-16">
+<section class="py-4">
 	<div class="container px-4">
-		<h2 class="mb-8 text-2xl font-bold text-center">Shop by category</h2>
-		<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-			{#each categories as category}
-				<a 
-					href={category.href}
-					class="group relative overflow-hidden rounded-lg aspect-[4/5] bg-muted"
-				>
-					<img
-						src={category.image}
-						alt={category.name}
-						class="absolute inset-0 h-full w-full object-cover transition-transform group-hover:scale-105"
-						loading="lazy"
-					/>
-					<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-					<div class="absolute bottom-0 left-0 right-0 p-4 text-white">
-						<h3 class="font-semibold">{category.name}</h3>
-						<p class="text-sm opacity-90">{category.count}</p>
-					</div>
-				</a>
-			{/each}
+		<h2 class="text-lg font-semibold mb-4">Browse by style</h2>
+		
+		<!-- Desktop: Horizontal scrollable categories -->
+		<div class="hidden md:block">
+			<div class="flex items-center space-x-4 overflow-x-auto pb-2">
+				{#each categories as category}
+					<a 
+						href={category.href}
+						class="group flex-shrink-0 text-center"
+					>
+						<div class="w-12 h-12 mx-auto mb-1 overflow-hidden rounded-full bg-muted">
+							<img
+								src={category.image}
+								alt={category.name}
+								class="h-full w-full object-cover transition-transform group-hover:scale-110"
+								loading="lazy"
+							/>
+						</div>
+						<h3 class="text-xs font-medium">{category.name}</h3>
+					</a>
+				{/each}
+			</div>
+		</div>
+
+		<!-- Mobile: Horizontal scroll (like main categories) -->
+		<div class="md:hidden">
+			<div class="flex space-x-4 overflow-x-auto pb-2 scrollbar-hide">
+				{#each categories as category}
+					<a 
+						href={category.href}
+						class="group flex-shrink-0 text-center"
+					>
+						<div class="w-12 h-12 mx-auto mb-1 overflow-hidden rounded-full bg-muted">
+							<img
+								src={category.image}
+								alt={category.name}
+								class="h-full w-full object-cover transition-transform group-hover:scale-110"
+								loading="lazy"
+							/>
+						</div>
+						<h3 class="text-xs font-medium whitespace-nowrap">{category.name}</h3>
+					</a>
+				{/each}
+			</div>
 		</div>
 	</div>
 </section>
+
+<style>
+	.scrollbar-hide {
+		-ms-overflow-style: none;
+		scrollbar-width: none;
+	}
+	.scrollbar-hide::-webkit-scrollbar {
+		display: none;
+	}
+</style>

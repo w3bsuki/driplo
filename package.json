@@ -40,9 +40,22 @@
 		"svelte": "^5.0.0",
 		"svelte-check": "^4.0.0",
 		"tailwind-merge": "^3.3.1",
+		"tailwind-variants": "^1.0.0",
 		"tailwindcss": "^4.0.0-alpha.35",
 		"typescript": "^5.0.0",
 		"vaul-svelte": "^0.3.2",
 		"vite": "^7.0.4"
+	},
+	"dependencies": {
+		"@stripe/stripe-js": "^7.4.0",
+		"@supabase/ssr": "^0.6.1",
+		"@supabase/supabase-js": "^2.50.5",
+		"@tanstack/svelte-query": "^5.83.0",
+		"sharp": "^0.34.3",
+		"stripe": "^18.3.0",
+		"svelte-sonner": "^1.0.5",
+		"sveltekit-superforms": "^2.27.1",
+		"zod": "^3.25.76",
+		"zod-form-data": "^3.0.0"
 	}
 }
