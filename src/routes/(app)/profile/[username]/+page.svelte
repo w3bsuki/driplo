@@ -11,12 +11,12 @@
 	import { Badge } from '$lib/components/ui/badge'
 	import { MessageCircle, Calendar, Package, Star } from 'lucide-svelte'
 	import { toast } from 'svelte-sonner'
-	import type { EnhancedUserProfile, UserRating, Listing } from '$lib/types'
+	// import type { EnhancedUserProfile, UserRating, Listing } from '$lib/types'
 	
 	// State
-	let profile = $state<EnhancedUserProfile | null>(null)
-	let listings = $state<Listing[]>([])
-	let reviews = $state<UserRating[]>([])
+	let profile = $state<any | null>(null)
+	let listings = $state<any[]>([])
+	let reviews = $state<any[]>([])
 	let isFollowing = $state(false)
 	let loading = $state(true)
 	let activeTab = $state<'listings' | 'reviews' | 'about'>('listings')
@@ -56,10 +56,17 @@
 				return
 			}
 			
-			// Set profile with empty achievements for now
+			// Set profile with missing fields
 			profile = {
 				...profileData,
-				achievements: []
+				achievements: [],
+				cover_image_url: profileData.cover_url || '',
+				member_since: profileData.created_at,
+				seller_rating: 0,
+				seller_rating_count: 0,
+				response_time_hours: 24,
+				total_sales: 0,
+				verification_badges: []
 			}
 			
 			// Load user's listings
@@ -73,20 +80,20 @@
 			
 			listings = listingsData || []
 			
-			// Load reviews
-			const { data: reviewsData } = await supabase
-				.from('user_ratings')
-				.select(`
-					*,
-					rater:rater_user_id(username, avatar_url, full_name),
-					listing:listing_id(title, images)
-				`)
-				.eq('rated_user_id', profile.id)
-				.eq('rating_type', 'seller')
-				.order('created_at', { ascending: false })
-				.limit(10)
+			// Load reviews (commented out until ratings table exists)
+			// const { data: reviewsData } = await supabase
+			// 	.from('user_ratings')
+			// 	.select(`
+			// 		*,
+			// 		rater:rater_user_id(username, avatar_url, full_name),
+			// 		listing:listing_id(title, images)
+			// 	`)
+			// 	.eq('rated_user_id', profile.id)
+			// 	.eq('rating_type', 'seller')
+			// 	.order('created_at', { ascending: false })
+			// 	.limit(10)
 			
-			reviews = reviewsData || []
+			reviews = [] // reviewsData || []
 			
 			// Check if current user follows this profile
 			const currentUser = $authUser
@@ -101,10 +108,10 @@
 				isFollowing = !!followData
 			}
 			
-			// Track profile view
-			if (!isOwnProfile) {
-				await trackProfileView()
-			}
+			// Track profile view (commented out until profile_views table exists)
+			// if (!isOwnProfile) {
+			// 	await trackProfileView()
+			// }
 			
 		} catch (error) {
 			console.error('Error loading profile:', error)
@@ -114,34 +121,34 @@
 		}
 	}
 	
-	async function trackProfileView() {
-		const currentUser = $authUser
-		if (!profile || !currentUser) return
+	// async function trackProfileView() {
+	// 	const currentUser = $authUser
+	// 	if (!profile || !currentUser) return
 		
-		try {
-			// Check if user already viewed this profile today
-			const today = new Date().toISOString().split('T')[0]
-			const { data: existingView } = await supabase
-				.from('profile_views')
-				.select('id')
-				.eq('profile_id', profile.id)
-				.eq('viewer_id', currentUser.id)
-				.gte('created_at', `${today}T00:00:00Z`)
-				.single()
+	// 	try {
+	// 		// Check if user already viewed this profile today
+	// 		const today = new Date().toISOString().split('T')[0]
+	// 		const { data: existingView } = await supabase
+	// 			.from('profile_views')
+	// 			.select('id')
+	// 			.eq('profile_id', profile.id)
+	// 			.eq('viewer_id', currentUser.id)
+	// 			.gte('created_at', `${today}T00:00:00Z`)
+	// 			.single()
 			
-			if (!existingView) {
-				await supabase
-					.from('profile_views')
-					.insert({
-						profile_id: profile.id,
-						viewer_id: currentUser.id
-					})
-			}
-		} catch (error) {
-			// Ignore errors for view tracking
-			console.log('View tracking error:', error)
-		}
-	}
+	// 		if (!existingView) {
+	// 			await supabase
+	// 				.from('profile_views')
+	// 				.insert({
+	// 					profile_id: profile.id,
+	// 					viewer_id: currentUser.id
+	// 				})
+	// 		}
+	// 	} catch (error) {
+	// 		// Ignore errors for view tracking
+	// 		console.log('View tracking error:', error)
+	// 	}
+	// }
 	
 	async function handleFollow() {
 		const currentUser = $authUser
@@ -191,7 +198,7 @@
 	}
 	
 	function handleEditProfile() {
-		goto('/account/settings')
+		goto('/profile/settings')
 	}
 	
 	function formatDate(dateString: string): string {
@@ -273,7 +280,7 @@
 						<!-- Listings Tab -->
 						{#if listings.length > 0}
 							<div class="bg-white rounded-xl p-4 shadow-sm">
-								<ListingGrid listings={listings} />
+								<ListingGrid listings={listings} title="" />
 							</div>
 						{:else}
 							<div class="bg-white rounded-xl p-8 text-center shadow-sm">

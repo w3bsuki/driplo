@@ -2,24 +2,52 @@
 	import { onMount } from 'svelte'
 	import { supabase } from '$lib/supabase'
 	import ListingCard from './ListingCard.svelte';
+	import InfiniteScroll from '$lib/components/ui/InfiniteScroll.svelte';
 	import type { Database } from '$lib/types/database'
-	
-	type Listing = Database['public']['Tables']['listings']['Row']
-	type Profile = Database['public']['Tables']['profiles']['Row']
 	
 	interface Props {
 		title?: string;
 		limit?: number;
 		orderBy?: 'created_at' | 'price' | 'view_count';
+		listings?: any[]; // Pre-loaded listings from server
+		showLoading?: boolean; // Override loading state
+		infiniteScroll?: boolean; // Enable infinite scroll
+		hasMore?: boolean; // Has more items to load
+		onLoadMore?: () => Promise<void> | void; // Load more callback
 	}
 	
-	let { title = 'Popular items', limit = 16, orderBy = 'created_at' }: Props = $props();
+	let { 
+		title = 'Popular items', 
+		limit = 16, 
+		orderBy = 'created_at',
+		listings: serverListings = null,
+		showLoading = false,
+		infiniteScroll = false,
+		hasMore = false,
+		onLoadMore
+	}: Props = $props();
 	
 	let listings = $state<any[]>([])
-	let loading = $state(true)
+	let loading = $state(showLoading)
+	
+	// If server listings provided, use them; otherwise load client-side
+	const shouldLoadClientSide = $derived(!serverListings)
 	
 	onMount(async () => {
-		await loadListings()
+		if (shouldLoadClientSide) {
+			await loadListings()
+		} else if (serverListings) {
+			listings = transformListings(serverListings)
+			loading = false
+		}
+	})
+	
+	// Watch for changes in server listings
+	$effect(() => {
+		if (serverListings && !shouldLoadClientSide) {
+			listings = transformListings(serverListings)
+			loading = false
+		}
 	})
 	
 	async function loadListings() {
@@ -38,22 +66,7 @@
 			
 			if (error) throw error
 			
-			// Transform data to match ListingCard props
-			listings = data?.map(listing => ({
-				id: listing.id,
-				title: listing.title,
-				price: listing.price,
-				size: listing.size,
-				brand: listing.brand,
-				image: listing.images?.[0] || 'https://picsum.photos/400/600?random=' + listing.id,
-				seller: {
-					username: listing.seller?.username || 'user',
-					avatar: listing.seller?.avatar_url
-				},
-				likes: 0, // We'll add this later
-				isLiked: false,
-				condition: listing.condition === 'new' ? 'new' : listing.condition === 'good' ? 'good' : 'worn'
-			})) || []
+			listings = transformListings(data || [])
 			
 		} catch (error) {
 			console.error('Error loading listings:', error)
@@ -61,6 +74,24 @@
 		} finally {
 			loading = false
 		}
+	}
+	
+	function transformListings(rawListings: any[]) {
+		return rawListings.map(listing => ({
+			id: listing.id,
+			title: listing.title,
+			price: listing.price,
+			size: listing.size,
+			brand: listing.brand,
+			image: listing.images?.[0] || `https://picsum.photos/400/600?random=${listing.id}`,
+			seller: {
+				username: listing.seller?.username || 'user',
+				avatar: listing.seller?.avatar_url
+			},
+			likes: listing.favorite_count || 0,
+			isLiked: false,
+			condition: listing.condition
+		}))
 	}
 </script>
 
@@ -82,6 +113,15 @@
 					<ListingCard {...listing} />
 				{/each}
 			</div>
+			
+			{#if infiniteScroll && onLoadMore}
+				<InfiniteScroll 
+					{hasMore} 
+					loading={loading} 
+					onLoadMore={onLoadMore}
+					class="mt-8"
+				/>
+			{/if}
 		{:else}
 			<div class="text-center py-12">
 				<div class="text-6xl mb-4">🛍️</div>

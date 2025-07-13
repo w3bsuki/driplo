@@ -15,6 +15,7 @@ export interface Database {
           username: string
           full_name: string | null
           avatar_url: string | null
+          cover_url: string | null
           bio: string | null
           location: string | null
           website: string | null
@@ -30,6 +31,7 @@ export interface Database {
           username: string
           full_name?: string | null
           avatar_url?: string | null
+          cover_url?: string | null
           bio?: string | null
           location?: string | null
           website?: string | null
@@ -45,6 +47,7 @@ export interface Database {
           username?: string
           full_name?: string | null
           avatar_url?: string | null
+          cover_url?: string | null
           bio?: string | null
           location?: string | null
           website?: string | null
@@ -130,7 +133,7 @@ export interface Database {
           images: Json[]
           status: string
           view_count: number
-          like_count: number
+          favorite_count: number
           is_negotiable: boolean
           shipping_included: boolean
           shipping_cost: number | null
@@ -158,7 +161,7 @@ export interface Database {
           images?: Json[]
           status?: string
           view_count?: number
-          like_count?: number
+          favorite_count?: number
           is_negotiable?: boolean
           shipping_included?: boolean
           shipping_cost?: number | null
@@ -186,7 +189,7 @@ export interface Database {
           images?: Json[]
           status?: string
           view_count?: number
-          like_count?: number
+          favorite_count?: number
           is_negotiable?: boolean
           shipping_included?: boolean
           shipping_cost?: number | null

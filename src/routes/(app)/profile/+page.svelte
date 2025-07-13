@@ -1,30 +1,33 @@
 <script lang="ts">
-	import { auth } from '$lib/stores/auth'
+	import { user } from '$lib/stores/auth'
+	import { supabase } from '$lib/supabase'
 	import { goto } from '$app/navigation'
 	import { onMount } from 'svelte'
 
-	onMount(() => {
-		let redirected = false
-		
-		const unsubscribeUser = auth.user.subscribe(user => {
-			if (redirected) return
-			
-			const unsubscribeProfile = auth.profile.subscribe(profile => {
-				if (redirected) return
-				
-				const unsubscribeLoading = auth.loading.subscribe(loading => {
-					if (redirected) return
-					
-					if (user && profile?.username) {
-						redirected = true
-						goto(`/profile/${profile.username}`)
-					} else if (!loading && !user) {
-						redirected = true  
-						goto('/auth/login')
-					}
-				})
-			})
-		})
+	onMount(async () => {
+		if (!$user) {
+			goto('/auth/login')
+			return
+		}
+
+		try {
+			// Get user's profile to find username
+			const { data: profile, error } = await supabase
+				.from('profiles')
+				.select('username')
+				.eq('id', $user.id)
+				.single()
+
+			if (error || !profile?.username) {
+				// If no profile exists, go to settings to create one
+				goto('/profile/settings')
+			} else {
+				goto(`/profile/${profile.username}`)
+			}
+		} catch (error) {
+			console.error('Error loading profile:', error)
+			goto('/profile/settings')
+		}
 	})
 </script>
 
