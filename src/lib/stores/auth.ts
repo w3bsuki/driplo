@@ -1,38 +1,39 @@
+import { writable } from 'svelte/store'
 import { supabase } from '$lib/supabase'
 import type { User, Session } from '@supabase/supabase-js'
 import type { Database } from '$lib/types/database'
 
 type Profile = Database['public']['Tables']['profiles']['Row']
 
-// Auth state using Svelte 5 runes
-let user = $state<User | null>(null)
-let session = $state<Session | null>(null)
-let profile = $state<Profile | null>(null)
-let loading = $state(true)
+// Auth state using Svelte stores
+export const user = writable<User | null>(null)
+export const session = writable<Session | null>(null)
+export const profile = writable<Profile | null>(null)
+export const loading = writable(true)
 
 // Initialize auth state
 supabase.auth.getSession().then(({ data: { session: initialSession } }) => {
-	session = initialSession
-	user = initialSession?.user ?? null
-	loading = false
+	session.set(initialSession)
+	user.set(initialSession?.user ?? null)
+	loading.set(false)
 	
-	if (user) {
-		loadProfile(user.id)
+	if (initialSession?.user) {
+		loadProfile(initialSession.user.id)
 	}
 })
 
 // Listen for auth changes
 supabase.auth.onAuthStateChange(async (event, newSession) => {
-	session = newSession
-	user = newSession?.user ?? null
+	session.set(newSession)
+	user.set(newSession?.user ?? null)
 	
-	if (user) {
-		await loadProfile(user.id)
+	if (newSession?.user) {
+		await loadProfile(newSession.user.id)
 	} else {
-		profile = null
+		profile.set(null)
 	}
 	
-	loading = false
+	loading.set(false)
 })
 
 async function loadProfile(userId: string) {
@@ -41,24 +42,48 @@ async function loadProfile(userId: string) {
 			.from('profiles')
 			.select('*')
 			.eq('id', userId)
-			.single()
+			.maybeSingle()
 		
 		if (error) throw error
-		profile = data
+		
+		// If no profile exists, create one
+		if (!data) {
+			console.log('No profile found, creating one...')
+			const { data: userData } = await supabase.auth.getUser()
+			if (userData.user) {
+				const { data: newProfile, error: createError } = await supabase
+					.from('profiles')
+					.insert({
+						id: userId,
+						username: userData.user.user_metadata?.username || `user_${userId.slice(0, 8)}`,
+						full_name: userData.user.user_metadata?.full_name || null
+					})
+					.select()
+					.single()
+				
+				if (createError) {
+					console.error('Error creating profile:', createError)
+					profile.set(null)
+				} else {
+					profile.set(newProfile)
+				}
+			}
+		} else {
+			profile.set(data)
+		}
 	} catch (error) {
 		console.error('Error loading profile:', error)
-		profile = null
+		profile.set(null)
 	}
 }
 
 // Auth actions
 export const auth = {
-	// State getters
-	get user() { return user },
-	get session() { return session },
-	get profile() { return profile },
-	get loading() { return loading },
-	get isAuthenticated() { return !!user },
+	// Store references
+	user,
+	session,
+	profile,
+	loading,
 	
 	// Auth methods
 	async signUp(email: string, password: string, username: string, fullName?: string) {
@@ -74,6 +99,28 @@ export const auth = {
 		})
 		
 		if (error) throw error
+		
+		// Manually create profile since trigger is disabled
+		if (data.user) {
+			try {
+				const { error: profileError } = await supabase
+					.from('profiles')
+					.insert({
+						id: data.user.id,
+						username: username,
+						full_name: fullName
+					})
+				
+				if (profileError) {
+					console.error('Profile creation error:', profileError)
+					// Don't throw here - user is created, profile can be fixed later
+				}
+			} catch (profileError) {
+				console.error('Profile creation failed:', profileError)
+				// Don't throw here - user is created, profile can be fixed later
+			}
+		}
+		
 		return data
 	},
 	
@@ -123,17 +170,24 @@ export const auth = {
 	},
 	
 	async updateProfile(updates: Partial<Profile>) {
-		if (!user) throw new Error('User not authenticated')
+		const currentUser = await new Promise<User | null>(resolve => {
+			const unsubscribe = user.subscribe(value => {
+				unsubscribe()
+				resolve(value)
+			})
+		})
+		
+		if (!currentUser) throw new Error('User not authenticated')
 		
 		const { data, error } = await supabase
 			.from('profiles')
 			.update(updates)
-			.eq('id', user.id)
+			.eq('id', currentUser.id)
 			.select()
 			.single()
 		
 		if (error) throw error
-		profile = data
+		profile.set(data)
 		return data
 	}
 }

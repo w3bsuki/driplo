@@ -51,10 +51,12 @@
 		"@supabase/ssr": "^0.6.1",
 		"@supabase/supabase-js": "^2.50.5",
 		"@tanstack/svelte-query": "^5.83.0",
+		"@types/uuid": "^10.0.0",
 		"sharp": "^0.34.3",
 		"stripe": "^18.3.0",
 		"svelte-sonner": "^1.0.5",
 		"sveltekit-superforms": "^2.27.1",
+		"uuid": "^11.1.0",
 		"zod": "^3.25.76",
 		"zod-form-data": "^3.0.0"
 	}

@@ -149,7 +149,7 @@ CREATE INDEX idx_activities_type ON user_activities(activity_type);
 -- Profile views indexes
 CREATE INDEX idx_profile_views_profile ON profile_views(profile_id);
 CREATE INDEX idx_profile_views_date ON profile_views(created_at DESC);
-CREATE INDEX idx_profile_views_daily ON profile_views(profile_id, viewer_id, (created_at::date));
+CREATE INDEX idx_profile_views_viewer ON profile_views(profile_id, viewer_id);
 
 -- =====================================================
 -- FUNCTIONS FOR RATING CALCULATIONS

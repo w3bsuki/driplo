@@ -8,5 +8,5 @@
 <HeroSearch />
 <LandingCategories />
 <QuickFilters />
-<ListingGrid title="Popular right now" />
-<ListingGrid title="Recently added" />
+<ListingGrid title="Recently added" orderBy="created_at" limit={16} />
+<ListingGrid title="Most viewed" orderBy="view_count" limit={16} />
