@@ -1,14 +1,14 @@
 <script lang="ts">
 	import { page } from '$app/stores'
 	import { goto } from '$app/navigation'
-	import { user as authUser } from '$lib/stores/auth'
+	import { user as authUser, auth } from '$lib/stores/auth'
 	import { supabase } from '$lib/supabase'
 	import ProfileHeader from '$lib/components/profile/ProfileHeader.svelte'
 	import ProfileStats from '$lib/components/profile/ProfileStats.svelte'
 	import ListingGrid from '$lib/components/listings/ListingGrid.svelte'
 	import { RatingStars, Button } from '$lib/components/ui'
 	import { Badge } from '$lib/components/ui/badge'
-	import { MessageCircle, Calendar, Package, Star } from 'lucide-svelte'
+	import { MessageCircle, Calendar, Package, Star, LogOut } from 'lucide-svelte'
 	import { toast } from 'svelte-sonner'
 	import type { PageData } from './$types'
 	
@@ -106,6 +106,16 @@
 	
 	function handleEditProfile() {
 		goto('/profile/settings')
+	}
+	
+	async function handleSignOut() {
+		try {
+			await auth.signOut()
+			toast.success('Signed out successfully')
+		} catch (error) {
+			console.error('Sign out error:', error)
+			toast.error('Failed to sign out')
+		}
 	}
 	
 	function formatDate(dateString: string): string {
@@ -319,7 +329,7 @@
 					<!-- Stats Component -->
 					<ProfileStats {profile} showDetailedStats={false} />
 					
-					<!-- Quick Actions (for non-own profiles) -->
+					<!-- Quick Actions -->
 					{#if !isOwnProfile}
 						<div class="bg-white rounded-xl shadow-sm p-4">
 							<h3 class="text-base font-semibold text-gray-900 mb-3">Quick Actions</h3>
@@ -336,6 +346,19 @@
 								>
 									<Star class="w-4 h-4" />
 									Save Seller
+								</button>
+							</div>
+						</div>
+					{:else}
+						<div class="bg-white rounded-xl shadow-sm p-4">
+							<h3 class="text-base font-semibold text-gray-900 mb-3">Account</h3>
+							<div class="space-y-2">
+								<button 
+									class="w-full bg-red-500 hover:bg-red-600 text-white font-medium py-2.5 px-4 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 text-sm"
+									onclick={handleSignOut}
+								>
+									<LogOut class="w-4 h-4" />
+									Sign Out
 								</button>
 							</div>
 						</div>

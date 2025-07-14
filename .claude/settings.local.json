@@ -5,7 +5,11 @@
       "Bash(npx supabase:*)",
       "Bash(chmod:*)",
       "Bash(rm:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(npm run dev:*)",
+      "Bash(curl:*)",
+      "Bash(git checkout:*)",
+      "WebFetch(domain:supabase.com)"
     ],
     "deny": []
   }

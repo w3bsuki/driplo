@@ -137,7 +137,7 @@
 							<input type="checkbox" class="rounded border-gray-300 text-orange-600 focus:ring-orange-500" />
 							<span class="ml-2 text-sm text-gray-600">Remember me</span>
 						</label>
-						<a href="/auth/forgot-password" class="text-sm text-orange-600 hover:text-orange-500">
+						<a href="/forgot-password" class="text-sm text-orange-600 hover:text-orange-500">
 							Forgot password?
 						</a>
 					</div>

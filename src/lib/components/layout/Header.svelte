@@ -1,8 +1,9 @@
 <script lang="ts">
-	import { Search, Heart, MessageCircle, User, Menu, X, Camera, Home } from 'lucide-svelte';
+	import { Search, Heart, MessageCircle, User, Menu, X, Camera, Home, LogOut } from 'lucide-svelte';
 	import { Button } from '$lib/components/ui';
 	import { goto } from '$app/navigation';
 	import { cn } from '$lib/utils';
+	import { user, profile, auth } from '$lib/stores/auth';
 	
 	let isMenuOpen = $state(false);
 	let searchQuery = $state('');
@@ -70,12 +71,6 @@
 
 		<!-- Desktop Actions -->
 		<div class="hidden md:flex items-center space-x-2">
-			<button 
-				onclick={() => goto('/sell')} 
-				class="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-4 py-2 rounded-lg font-medium shadow-sm hover:shadow-md transition-all duration-200 whitespace-nowrap"
-			>
-				Sell now
-			</button>
 			<button class="relative p-2 hover:bg-muted rounded-lg transition-colors">
 				<Heart class="h-5 w-5 text-muted-foreground hover:text-foreground" />
 				<span class="sr-only">Favorites</span>
@@ -84,18 +79,17 @@
 				<MessageCircle class="h-5 w-5 text-muted-foreground hover:text-foreground" />
 				<span class="sr-only">Messages</span>
 			</a>
-			<a href="/profile" class="relative p-2 hover:bg-muted rounded-lg transition-colors">
+			<a href={$user ? ($profile?.username ? `/profile/${$profile.username}` : '/profile') : '/login'} class="relative p-2 hover:bg-muted rounded-lg transition-colors">
 				<User class="h-5 w-5 text-muted-foreground hover:text-foreground" />
-				<span class="sr-only">Profile</span>
+				<span class="sr-only">{$user ? 'Profile' : 'Sign in'}</span>
 			</a>
 		</div>
 
 		<!-- Mobile Actions -->
 		<div class="flex md:hidden items-center gap-2 ml-auto">
-			<a href="/sell" class="relative">
-				<div class="bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg px-3 py-2 text-sm font-medium shadow-sm active:scale-95 transition-transform duration-150">
-					Sell
-				</div>
+			<a href={$user ? ($profile?.username ? `/profile/${$profile.username}` : '/profile') : '/login'} class="relative p-2 hover:bg-muted rounded-lg transition-colors">
+				<User class="h-5 w-5 text-muted-foreground hover:text-foreground" />
+				<span class="sr-only">{$user ? 'Profile' : 'Sign in'}</span>
 			</a>
 			<Button 
 				variant="ghost" 
@@ -198,7 +192,7 @@
 							Messages
 						</a>
 						<a 
-							href="/profile" 
+							href={$user ? ($profile?.username ? `/profile/${$profile.username}` : '/profile') : '/login'} 
 							onclick={closeMenu}
 							class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100"
 						>
@@ -213,6 +207,16 @@
 							<Heart class="h-4 w-4" />
 							Favorites
 						</a>
+						{#if $user}
+							<a 
+								href="/profile/settings" 
+								onclick={closeMenu}
+								class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100"
+							>
+								<User class="h-4 w-4" />
+								Settings
+							</a>
+						{/if}
 					</div>
 				</nav>
 

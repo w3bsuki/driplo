@@ -6,7 +6,7 @@
 
 	onMount(async () => {
 		if (!$user) {
-			goto('/auth/login')
+			goto('/login')
 			return
 		}
 
