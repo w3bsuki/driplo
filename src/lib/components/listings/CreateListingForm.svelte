@@ -242,6 +242,16 @@
 					+ '-' + Date.now().toString(36) // Add unique suffix
 			}
 
+			// Validate UUID format
+			const isValidUUID = (str: string) => {
+				const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+				return uuidRegex.test(str)
+			}
+
+			// Debug category_id
+			console.log('Form category_id:', formData.category_id)
+			console.log('Is valid UUID:', isValidUUID(formData.category_id))
+
 			// Create listing with all fields
 			const listingData: any = {
 				title: formData.title.trim(),
@@ -253,14 +263,16 @@
 				seller_id: $user.id,
 				status: 'active',
 				slug: generateSlug(formData.title),
-				category_id: formData.category_id || null,
-				subcategory_id: formData.subcategory || null,
+				category_id: (formData.category_id && isValidUUID(formData.category_id)) ? formData.category_id : null,
+				subcategory_id: (formData.subcategory && isValidUUID(formData.subcategory)) ? formData.subcategory : null,
 				size: formData.size || null,
 				brand: formData.brand || null,
 				color: formData.color || null,
 				tags: formData.tags || [],
 				ships_worldwide: formData.shipping_type === 'worldwide'
 			}
+			
+			console.log('Listing data to insert:', listingData)
 			
 			const { data, error } = await supabase
 				.from('listings')
@@ -344,7 +356,7 @@
 		<div class="max-w-2xl mx-auto px-4">
 			<div class="flex items-center justify-between py-4">
 				<button 
-					on:click={() => goto('/sell')}
+					onclick={() => goto('/sell')}
 					class="text-gray-600 hover:text-gray-900"
 				>
 					<ChevronLeft class="w-5 h-5" />
@@ -371,7 +383,7 @@
 	
 	<!-- Form Content -->
 	<div class="max-w-2xl mx-auto px-4 py-6">
-		<form on:submit|preventDefault={handleSubmit}>
+		<form onsubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
 			<!-- Step 1: Basic Info -->
 			{#if currentStep === 1}
 				<div class="space-y-6 animate-in">
@@ -463,7 +475,7 @@
 									type="file"
 									accept="image/*"
 									multiple
-									on:change={handleImageSelect}
+									onchange={handleImageSelect}
 									class="sr-only"
 								/>
 								<div class="flex flex-col items-center justify-center h-full text-gray-400">
@@ -491,7 +503,7 @@
 											{#if index > 0}
 												<button
 													type="button"
-													on:click={() => moveImage(index, index - 1)}
+													onclick={() => moveImage(index, index - 1)}
 													class="p-2 bg-white rounded-full text-gray-700 hover:bg-gray-100"
 												>
 													<ChevronLeft class="w-4 h-4" />
@@ -499,7 +511,7 @@
 											{/if}
 											<button
 												type="button"
-												on:click={() => removeImage(index)}
+												onclick={() => removeImage(index)}
 												class="p-2 bg-white rounded-full text-red-600 hover:bg-gray-100"
 											>
 												<X class="w-4 h-4" />
@@ -507,7 +519,7 @@
 											{#if index < formData.images.length - 1}
 												<button
 													type="button"
-													on:click={() => moveImage(index, index + 1)}
+													onclick={() => moveImage(index, index + 1)}
 													class="p-2 bg-white rounded-full text-gray-700 hover:bg-gray-100"
 												>
 													<ChevronRight class="w-4 h-4" />
@@ -527,7 +539,7 @@
 											type="file"
 											accept="image/*"
 											multiple
-											on:change={handleImageSelect}
+											onchange={handleImageSelect}
 											class="sr-only"
 										/>
 										<div class="text-center">
@@ -726,7 +738,7 @@
 									#{tag}
 									<button
 										type="button"
-										on:click={() => removeTag(tag)}
+										onclick={() => removeTag(tag)}
 										class="ml-1 p-0.5 hover:bg-orange-200 rounded"
 									>
 										<X class="w-3 h-3" />
@@ -742,7 +754,7 @@
 									{#each suggestedTags() as tag}
 										<button
 											type="button"
-											on:click={() => addTag(tag)}
+											onclick={() => addTag(tag)}
 											class="text-xs bg-gray-100 hover:bg-gray-200 px-2 py-1 rounded-full transition-colors"
 										>
 											+ {tag}
@@ -755,7 +767,7 @@
 						<input
 							type="text"
 							placeholder="Add a tag and press Enter"
-							on:keydown={(e) => {
+							onkeydown={(e) => {
 								if (e.key === 'Enter') {
 									e.preventDefault()
 									const input = e.target as HTMLInputElement

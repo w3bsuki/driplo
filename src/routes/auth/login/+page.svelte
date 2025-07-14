@@ -72,7 +72,7 @@
 			</p>
 		</div>
 		
-		<form class="mt-8 space-y-6" on:submit={handleLogin}>
+		<form class="mt-8 space-y-6" onsubmit={handleLogin}>
 			<div class="space-y-4">
 				<div>
 					<label for="email" class="block text-sm font-medium text-gray-700">
@@ -133,7 +133,7 @@
 					type="button"
 					variant="outline"
 					class="w-full"
-					on:click={handleGoogleLogin}
+					onclick={handleGoogleLogin}
 				>
 					<svg class="w-5 h-5 mr-2" viewBox="0 0 24 24">
 						<path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>

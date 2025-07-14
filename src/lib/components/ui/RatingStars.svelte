@@ -77,7 +77,7 @@
 	class="flex items-center gap-1"
 	role={interactive ? 'radiogroup' : 'img'}
 	aria-label={interactive ? 'Rate this item' : `Rating: ${rating} out of ${maxRating} stars`}
-	on:mouseleave={handleMouseLeave}
+	onmouseleave={handleMouseLeave}
 >
 	{#each Array(maxRating) as _, index}
 		{@const starIndex = index + 1}
@@ -89,9 +89,9 @@
 			class:pointer-events-none={!interactive}
 			disabled={!interactive}
 			aria-label={interactive ? `Rate ${starIndex} star${starIndex > 1 ? 's' : ''}` : ''}
-			on:click={() => handleStarClick(starIndex)}
-			on:mouseenter={() => handleStarHover(starIndex)}
-			on:focus={() => handleStarHover(starIndex)}
+			onclick={() => handleStarClick(starIndex)}
+			onmouseenter={() => handleStarHover(starIndex)}
+			onfocus={() => handleStarHover(starIndex)}
 		>
 			{#if fill === 'full'}
 				<Star 

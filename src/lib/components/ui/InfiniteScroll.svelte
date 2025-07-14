@@ -18,7 +18,7 @@
 		class: className = ''
 	}: Props = $props()
 
-	let sentinelElement: HTMLElement
+	let sentinelElement = $state<HTMLElement>()
 
 	onMount(() => {
 		if (!sentinelElement) return

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/stores'
+	import { goto } from '$app/navigation'
 	import { user as authUser } from '$lib/stores/auth'
 	import { supabase } from '$lib/supabase'
 	import ProfileHeader from '$lib/components/profile/ProfileHeader.svelte'
@@ -143,7 +144,7 @@
 								? 'border-orange-500 text-orange-600 bg-orange-50/50' 
 								: 'border-transparent text-gray-600'
 							}"
-						on:click={() => activeTab = 'listings'}
+						onclick={() => activeTab = 'listings'}
 					>
 						<span class="block">Listings</span>
 						<span class="text-xs font-normal opacity-70">{listings.length}</span>
@@ -154,7 +155,7 @@
 								? 'border-orange-500 text-orange-600 bg-orange-50/50' 
 								: 'border-transparent text-gray-600'
 							}"
-						on:click={() => activeTab = 'reviews'}
+						onclick={() => activeTab = 'reviews'}
 					>
 						<span class="block">Reviews</span>
 						<span class="text-xs font-normal opacity-70">{reviews.length}</span>
@@ -165,7 +166,7 @@
 								? 'border-orange-500 text-orange-600 bg-orange-50/50' 
 								: 'border-transparent text-gray-600'
 							}"
-						on:click={() => activeTab = 'about'}
+						onclick={() => activeTab = 'about'}
 					>
 						About
 					</button>
@@ -325,7 +326,7 @@
 							<div class="space-y-2">
 								<button 
 									class="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-medium py-2.5 px-4 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 text-sm"
-									on:click={handleMessage}
+									onclick={handleMessage}
 								>
 									<MessageCircle class="w-4 h-4" />
 									Send Message
@@ -361,7 +362,7 @@
 			<p class="text-gray-600 mb-4">The user you're looking for doesn't exist.</p>
 			<button 
 				class="bg-orange-500 hover:bg-orange-600 text-white font-medium py-2 px-4 rounded-lg transition-colors"
-				on:click={() => goto('/')}
+				onclick={() => goto('/')}
 			>
 				Go Home
 			</button>

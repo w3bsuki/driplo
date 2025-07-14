@@ -79,7 +79,7 @@
 		{#if isOwnProfile}
 			<button 
 				class="absolute top-2 right-2 sm:top-3 sm:right-3 bg-white/20 backdrop-blur-md hover:bg-white/30 text-white p-2 rounded-full transition-all"
-				on:click={onEditProfile}
+				onclick={onEditProfile}
 			>
 				<Camera class="w-4 h-4" />
 			</button>
@@ -112,7 +112,7 @@
 						variant="outline"
 						size="sm"
 						class="text-xs sm:text-sm border-orange-500 text-orange-600 hover:bg-orange-50"
-						on:click={onEditProfile}
+						onclick={onEditProfile}
 					>
 						Edit Profile
 					</Button>
@@ -124,7 +124,7 @@
 							? 'text-xs sm:text-sm border-gray-300' 
 							: 'text-xs sm:text-sm bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600'
 						}
-						on:click={onFollow}
+						onclick={onFollow}
 					>
 						{#if isFollowing}
 							<UserMinus class="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
@@ -138,7 +138,7 @@
 						size="sm"
 						variant="outline"
 						class="text-xs sm:text-sm border-gray-300"
-						on:click={onMessage}
+						onclick={onMessage}
 					>
 						<MessageCircle class="w-3 h-3 sm:w-4 sm:h-4 sm:mr-1" />
 						<span class="hidden sm:inline">Message</span>

@@ -139,11 +139,13 @@
 	<!-- Mobile Menu Overlay & Panel -->
 	{#if isMenuOpen}
 		<!-- Backdrop -->
-		<div 
+		<button 
+			type="button"
 			class="fixed top-0 left-0 right-0 bottom-0 z-[99]" 
 			style="background-color: rgba(0, 0, 0, 0.5);"
 			onclick={closeMenu}
-		></div>
+			aria-label="Close menu"
+		></button>
 		
 		<!-- Slide-out Panel -->
 		<div class="fixed top-0 right-0 bottom-0 z-[100] w-72 max-w-[85vw] shadow-2xl border-l border-gray-200" style="background-color: #ffffff !important; opacity: 1 !important;">

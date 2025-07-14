@@ -60,7 +60,7 @@
 					<Button
 						variant="outline"
 						class="w-full"
-						on:click={() => handleOAuth('google')}
+						onclick={() => handleOAuth('google')}
 						disabled={loading}
 					>
 						<Mail class="w-4 h-4 mr-2" />
@@ -69,7 +69,7 @@
 					<Button
 						variant="outline"
 						class="w-full"
-						on:click={() => handleOAuth('github')}
+						onclick={() => handleOAuth('github')}
 						disabled={loading}
 					>
 						<Github class="w-4 h-4 mr-2" />
@@ -88,7 +88,7 @@
 				</div>
 
 				<!-- Login Form -->
-				<form on:submit|preventDefault={handleLogin} class="space-y-4">
+				<form onsubmit={(e) => { e.preventDefault(); handleLogin(); }} class="space-y-4">
 					<div>
 						<label for="email" class="block text-sm font-medium text-gray-700 mb-1">
 							Email address
@@ -121,7 +121,7 @@
 							<button
 								type="button"
 								class="absolute inset-y-0 right-0 pr-3 flex items-center"
-								on:click={() => showPassword = !showPassword}
+								onclick={() => showPassword = !showPassword}
 							>
 								{#if showPassword}
 									<EyeOff class="h-4 w-4 text-gray-400" />

@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { createEventDispatcher } from 'svelte'
 	import { Upload, X, Camera, Loader2 } from 'lucide-svelte'
 	import { Button } from '$lib/components/ui'
 	import { cn } from '$lib/utils'
@@ -12,6 +11,9 @@
 		allowedTypes?: string[]
 		class?: string
 		disabled?: boolean
+		onupload?: (data: { file: File; preview: string }) => void
+		onremove?: () => void
+		onerror?: (error: string) => void
 	}
 
 	let {
@@ -21,7 +23,10 @@
 		maxSizeBytes = 5 * 1024 * 1024, // 5MB default
 		allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'],
 		class: className = '',
-		disabled = false
+		disabled = false,
+		onupload,
+		onremove,
+		onerror
 	}: Props = $props()
 
 	let fileInput: HTMLInputElement
@@ -29,12 +34,6 @@
 	let dragOver = $state(false)
 	let uploading = $state(false)
 	let error = $state('')
-
-	const dispatch = createEventDispatcher<{
-		upload: { file: File; preview: string }
-		remove: void
-		error: string
-	}>()
 
 	// Initialize preview with current image
 	$effect(() => {
@@ -65,14 +64,14 @@
 		// Validate file type
 		if (!allowedTypes.includes(file.type)) {
 			error = `Only ${allowedTypes.map(t => t.split('/')[1]).join(', ')} files are allowed`
-			dispatch('error', error)
+			onerror?.(error)
 			return
 		}
 
 		// Validate file size
 		if (file.size > maxSizeBytes) {
 			error = `File size must be less than ${Math.round(maxSizeBytes / 1024 / 1024)}MB`
-			dispatch('error', error)
+			onerror?.(error)
 			return
 		}
 
@@ -80,7 +79,7 @@
 		const reader = new FileReader()
 		reader.onload = (e) => {
 			previewUrl = e.target?.result as string
-			dispatch('upload', { file, preview: previewUrl })
+			onupload?.({ file, preview: previewUrl })
 		}
 		reader.readAsDataURL(file)
 	}
@@ -91,7 +90,7 @@
 		if (fileInput) {
 			fileInput.value = ''
 		}
-		dispatch('remove')
+		onremove?.()
 	}
 
 	function triggerFileInput() {

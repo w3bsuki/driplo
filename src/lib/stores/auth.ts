@@ -12,13 +12,18 @@ export const profile = writable<Profile | null>(null)
 export const loading = writable(true)
 
 // Initialize auth state
-supabase.auth.getSession().then(({ data: { session: initialSession } }) => {
-	session.set(initialSession)
-	user.set(initialSession?.user ?? null)
-	loading.set(false)
-	
-	if (initialSession?.user) {
-		loadProfile(initialSession.user.id)
+supabase.auth.getUser().then(({ data: { user: initialUser }, error }) => {
+	if (!error && initialUser) {
+		supabase.auth.getSession().then(({ data: { session: initialSession } }) => {
+			session.set(initialSession)
+			user.set(initialUser)
+			loading.set(false)
+			loadProfile(initialUser.id)
+		})
+	} else {
+		session.set(null)
+		user.set(null)
+		loading.set(false)
 	}
 })
 
