@@ -207,4 +207,35 @@
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
+  
+  /* iOS form fixes */
+  @supports (-webkit-touch-callout: none) {
+    /* iOS specific styles */
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="tel"],
+    input[type="number"],
+    input[type="search"],
+    textarea,
+    select {
+      font-size: 16px !important; /* Prevents zoom on iOS */
+      -webkit-appearance: none;
+      -webkit-text-size-adjust: 100%;
+    }
+    
+    /* Prevent iOS bounce/elastic scrolling */
+    body {
+      position: fixed;
+      width: 100%;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    
+    /* Fix for position fixed */
+    .min-h-screen {
+      min-height: 100vh;
+      min-height: -webkit-fill-available;
+    }
+  }
 }
