@@ -5,6 +5,8 @@
 	"type": "module",
 	"scripts": {
 		"dev": "vite dev",
+		"dev:clean": "rm -rf node_modules/.vite && vite dev",
+		"dev:safe": "NODE_OPTIONS='--max-old-space-size=4096' vite dev",
 		"build": "vite build",
 		"preview": "vite preview",
 		"prepare": "svelte-kit sync || echo ''",
@@ -47,6 +49,8 @@
 		"vite": "^7.0.4"
 	},
 	"dependencies": {
+		"@inlang/paraglide-js": "^2.2.0",
+		"@inlang/paraglide-sveltekit": "^0.16.1",
 		"@stripe/stripe-js": "^7.4.0",
 		"@supabase/ssr": "^0.6.1",
 		"@supabase/supabase-js": "^2.50.5",

@@ -3,8 +3,10 @@
   import HeroSearch from '$lib/components/home/HeroSearch.svelte';
   import ListingGrid from '$lib/components/listings/ListingGrid.svelte';
   import ReusableFilters from '$lib/components/shared/ReusableFilters.svelte';
+  import MobileStickyFilters from './MobileStickyFilters.svelte';
   import { cn } from '$lib/utils';
   import { ChevronRight } from 'lucide-svelte';
+  import { browser } from '$app/environment';
   
   interface Props {
     category: Category;
@@ -21,6 +23,24 @@
   let selectedConditions = $state<string[]>([]);
   let selectedPriceRange = $state('');
   let searchQuery = $state('');
+  
+  // Mobile filter states
+  let mobileSelectedCategory = $state('');
+  let mobileSelectedSize = $state('');
+  let mobileSelectedCondition = $state('');
+  let mobileSelectedPrice = $state('');
+  let mobileSelectedBrand = $state('');
+  
+  // Detect mobile
+  let isMobile = $state(false);
+  $effect(() => {
+    if (browser) {
+      isMobile = window.innerWidth < 768;
+      window.addEventListener('resize', () => {
+        isMobile = window.innerWidth < 768;
+      });
+    }
+  });
   
   // Filter configuration for category pages
   const filterGroups = [
@@ -74,6 +94,11 @@
       filtered = filtered.filter(p => p.subcategory_id === selectedSubcategory);
     }
     
+    // Mobile category filter
+    if (mobileSelectedCategory) {
+      filtered = filtered.filter(p => p.subcategory === mobileSelectedCategory);
+    }
+    
     // Search filter
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
@@ -84,17 +109,27 @@
       );
     }
     
-    // Size filter
+    // Size filter (desktop)
     if (selectedFilters.size.length > 0) {
       filtered = filtered.filter(p => selectedFilters.size.includes(p.size));
     }
     
-    // Condition filter
+    // Size filter (mobile)
+    if (mobileSelectedSize) {
+      filtered = filtered.filter(p => p.size === mobileSelectedSize);
+    }
+    
+    // Condition filter (desktop)
     if (selectedFilters.condition.length > 0) {
       filtered = filtered.filter(p => selectedFilters.condition.includes(p.condition));
     }
     
-    // Price filter
+    // Condition filter (mobile)
+    if (mobileSelectedCondition) {
+      filtered = filtered.filter(p => p.condition === mobileSelectedCondition);
+    }
+    
+    // Price filter (desktop)
     if (selectedFilters.price) {
       const [min, max] = selectedFilters.price.split('-').map(Number);
       filtered = filtered.filter(p => {
@@ -104,6 +139,27 @@
           return p.price >= min;
         }
       });
+    }
+    
+    // Price filter (mobile)
+    if (mobileSelectedPrice) {
+      if (mobileSelectedPrice === '100+') {
+        filtered = filtered.filter(p => p.price >= 100);
+      } else {
+        const [min, max] = mobileSelectedPrice.split('-').map(Number);
+        filtered = filtered.filter(p => {
+          if (max) {
+            return p.price >= min && p.price <= max;
+          } else {
+            return p.price >= min;
+          }
+        });
+      }
+    }
+    
+    // Brand filter (mobile)
+    if (mobileSelectedBrand) {
+      filtered = filtered.filter(p => p.brand?.toLowerCase() === mobileSelectedBrand);
     }
     
     return filtered;
@@ -117,12 +173,38 @@
     selectedSubcategory = subcategory;
   }
   
+  function handleMobileFilterChange(type: string, value: string) {
+    switch(type) {
+      case 'category':
+        mobileSelectedCategory = value;
+        break;
+      case 'size':
+        mobileSelectedSize = value;
+        break;
+      case 'condition':
+        mobileSelectedCondition = value;
+        break;
+      case 'price':
+        mobileSelectedPrice = value;
+        break;
+      case 'brand':
+        mobileSelectedBrand = value;
+        break;
+    }
+  }
+  
   function clearFilters() {
     selectedSubcategory = 'all';
     selectedFilters.price = '';
     selectedFilters.size = [];
     selectedFilters.condition = [];
     searchQuery = '';
+    // Clear mobile filters
+    mobileSelectedCategory = '';
+    mobileSelectedSize = '';
+    mobileSelectedCondition = '';
+    mobileSelectedPrice = '';
+    mobileSelectedBrand = '';
   }
   
   const hasActiveFilters = $derived(
@@ -130,8 +212,23 @@
     selectedFilters.size.length > 0 ||
     selectedFilters.condition.length > 0 ||
     selectedFilters.price !== '' ||
-    searchQuery !== ''
+    searchQuery !== '' ||
+    mobileSelectedCategory !== '' ||
+    mobileSelectedSize !== '' ||
+    mobileSelectedCondition !== '' ||
+    mobileSelectedPrice !== '' ||
+    mobileSelectedBrand !== ''
   );
+  
+  const mobileActiveFilterCount = $derived(() => {
+    let count = 0;
+    if (mobileSelectedCategory) count++;
+    if (mobileSelectedSize) count++;
+    if (mobileSelectedCondition) count++;
+    if (mobileSelectedPrice) count++;
+    if (mobileSelectedBrand) count++;
+    return count;
+  });
 </script>
 
 <!-- Hero Section with Top Sellers and Search -->
@@ -211,17 +308,33 @@
   </div>
 </section>
 
-<!-- Category Filters -->
-<ReusableFilters 
-  filters={filterGroups}
-  {selectedFilters}
-  {subcategories}
-  showSubcategories={true}
-  {selectedSubcategory}
-  onFilterChange={handleFilterChange}
-  onSubcategoryChange={handleSubcategoryChange}
-  onClearFilters={clearFilters}
-/>
+<!-- Mobile Sticky Filters (visible on mobile only) -->
+{#if isMobile}
+  <MobileStickyFilters
+    selectedCategory={mobileSelectedCategory}
+    selectedSize={mobileSelectedSize}
+    selectedCondition={mobileSelectedCondition}
+    selectedPrice={mobileSelectedPrice}
+    selectedBrand={mobileSelectedBrand}
+    onFilterChange={handleMobileFilterChange}
+    onClearFilters={clearFilters}
+    activeFilterCount={mobileActiveFilterCount()}
+  />
+{/if}
+
+<!-- Desktop Category Filters -->
+{#if !isMobile}
+  <ReusableFilters 
+    filters={filterGroups}
+    {selectedFilters}
+    {subcategories}
+    showSubcategories={true}
+    {selectedSubcategory}
+    onFilterChange={handleFilterChange}
+    onSubcategoryChange={handleSubcategoryChange}
+    onClearFilters={clearFilters}
+  />
+{/if}
 
 <!-- Products Grid -->
 <div class="container mx-auto px-4 py-8">

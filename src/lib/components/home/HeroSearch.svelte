@@ -65,7 +65,7 @@
 	}
 </script>
 
-<section class="relative bg-gradient-to-b from-orange-50 to-white py-3 md:py-4 pb-0">
+<section class="relative pt-4 md:pt-6 pb-2 md:pb-3">
 	<div class="container px-4">
 		<div class="max-w-3xl mx-auto">
 			
@@ -137,18 +137,21 @@
 					</div>
 					
 					<!-- Trending Category Links -->
-					<div class="border-t border-orange-100 py-2 flex items-center gap-3 overflow-x-auto">
-						<div class="flex items-center gap-3 px-4">
-							<span class="text-xs text-gray-500 flex-shrink-0 hidden md:block">Trending:</span>
-							{#each trendingCategories as category}
-								<button
-									onclick={() => goToCategory(category.value)}
-									class="flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/80 backdrop-blur-sm shadow-sm text-gray-800 hover:bg-white hover:shadow-md transition-all duration-200 text-xs font-medium whitespace-nowrap group"
-								>
-									<span class="text-sm">{category.icon}</span>
-									<span>{category.name}</span>
-								</button>
-							{/each}
+					<div class="border-t border-orange-100 py-2 px-4">
+						<div class="overflow-x-auto mx-2">
+							<div class="flex items-center gap-3 pl-0 pr-4">
+								<span class="text-xs text-gray-500 flex-shrink-0 hidden md:block mr-1">Trending:</span>
+								{#each trendingCategories as category}
+									<button
+										onclick={() => goToCategory(category.value)}
+										class="flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/80 backdrop-blur-sm shadow-sm text-gray-800 hover:bg-white hover:shadow-md transition-all duration-200 text-xs font-medium whitespace-nowrap group flex-shrink-0"
+									>
+										<span class="text-sm">{category.icon}</span>
+										<span>{category.name}</span>
+									</button>
+								{/each}
+								<div class="w-16 flex-shrink-0"></div>
+							</div>
 						</div>
 					</div>
 				</div>
