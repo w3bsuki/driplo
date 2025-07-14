@@ -6,19 +6,11 @@
 	import { initializeAuth } from '$lib/stores/auth';
 	import { onMount } from 'svelte';
 	import { invalidate } from '$app/navigation';
-	import { getLocale, getTextDirection } from '$lib/i18n.js';
-	import { languageTag } from '$lib/paraglide/runtime.js';
 
-	let { data, children } = $props();
+	export let data;
 
 	// Initialize auth store with server-side data
-	$effect(() => {
-		initializeAuth(data.user, data.session);
-	});
-	
-	// Reactive locale and direction - ADVANCED PATTERN
-	let locale = $derived(getLocale() || 'en');
-	let textDirection = $derived(getTextDirection());
+	$: initializeAuth(data.user, data.session);
 
 	onMount(() => {
 		// Listen for auth changes and invalidate data
@@ -34,15 +26,10 @@
 	});
 </script>
 
-<!-- ONE-LINER RTL PATTERN FROM YOUR GUIDE -->
-<svelte:head>
-	<html lang={locale} dir={textDirection}></html>
-</svelte:head>
-
 <div class="min-h-screen bg-background">
 	<Header categories={data.categories} />
 	<main class="pb-16 md:pb-0">
-		{@render children()}
+		<slot />
 	</main>
 	<MobileNav categories={data.categories} />
 </div>

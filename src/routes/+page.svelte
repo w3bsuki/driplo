@@ -8,12 +8,8 @@
 	let { data }: { data: PageData } = $props();
 </script>
 
-<!-- Hero & Categories Section with unified gradient background -->
-<div class="bg-gradient-to-b from-orange-50 via-orange-50/50 to-white">
-	<HeroSearch categories={data.categories} />
-	<LandingCategories categories={data.categories} />
-</div>
-
+<HeroSearch categories={data.categories} />
+<LandingCategories categories={data.categories} />
 <!-- Filters positioned above product cards for better UX -->
 <QuickFilters />
 <ListingGrid title="" listings={data.featuredListings} showLoading={false} />

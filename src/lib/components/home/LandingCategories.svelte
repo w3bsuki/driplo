@@ -13,37 +13,31 @@
 	let selectedCategory = $state('');
 	let hoveredCategory = $state('');
 
-	// Category styling mapping
-	const categoryStyles: Record<string, { icon: string; color: string; bgColor: string }> = {
+	// Category images mapping
+	const categoryImages: Record<string, { image: string; color: string }> = {
 		women: {
-			icon: '👗',
-			color: 'from-pink-400 to-purple-400',
-			bgColor: 'bg-gradient-to-br from-pink-100 to-purple-100'
+			image: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=400&h=400&fit=crop',
+			color: 'from-pink-400 to-purple-400'
 		},
 		men: {
-			icon: '👔',
-			color: 'from-blue-400 to-indigo-400',
-			bgColor: 'bg-gradient-to-br from-blue-100 to-indigo-100'
+			image: 'https://images.unsplash.com/photo-1516257984-b1b4d707412e?w=400&h=400&fit=crop',
+			color: 'from-blue-400 to-indigo-400'
 		},
 		kids: {
-			icon: '🧸',
-			color: 'from-green-400 to-teal-400',
-			bgColor: 'bg-gradient-to-br from-green-100 to-teal-100'
+			image: 'https://images.unsplash.com/photo-1503919545889-aef636e10ad4?w=400&h=400&fit=crop',
+			color: 'from-green-400 to-teal-400'
 		},
 		designer: {
-			icon: '💎',
-			color: 'from-yellow-400 to-orange-400',
-			bgColor: 'bg-gradient-to-br from-yellow-100 to-orange-100'
+			image: 'https://images.unsplash.com/photo-1609709295948-17d77cb2a69b?w=400&h=400&fit=crop',
+			color: 'from-yellow-400 to-orange-400'
 		},
 		shoes: {
-			icon: '👟',
-			color: 'from-red-400 to-pink-400',
-			bgColor: 'bg-gradient-to-br from-red-100 to-pink-100'
+			image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=400&fit=crop',
+			color: 'from-red-400 to-pink-400'
 		},
 		bags: {
-			icon: '👜',
-			color: 'from-purple-400 to-pink-400',
-			bgColor: 'bg-gradient-to-br from-purple-100 to-pink-100'
+			image: 'https://images.unsplash.com/photo-1590874103328-eac38a683ce7?w=400&h=400&fit=crop',
+			color: 'from-purple-400 to-pink-400'
 		}
 	};
 
@@ -52,19 +46,17 @@
 			name: 'All',
 			value: '',
 			slug: '',
-			icon: '🔍',
+			image: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&h=400&fit=crop',
 			count: 'Browse all',
-			color: 'from-orange-400 to-pink-400',
-			bgColor: 'bg-gradient-to-br from-orange-100 to-pink-100'
+			color: 'from-orange-400 to-pink-400'
 		},
 		...categories.map(cat => ({
 			name: cat.name,
 			value: cat.slug,
 			slug: cat.slug,
-			icon: categoryStyles[cat.slug]?.icon || '📦',
+			image: categoryImages[cat.slug]?.image || 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&h=400&fit=crop',
 			count: `${cat.product_count?.[0]?.count || 0} items`,
-			color: categoryStyles[cat.slug]?.color || 'from-gray-400 to-gray-600',
-			bgColor: categoryStyles[cat.slug]?.bgColor || 'bg-gradient-to-br from-gray-100 to-gray-200'
+			color: categoryImages[cat.slug]?.color || 'from-gray-400 to-gray-600'
 		}))
 	]);
 
@@ -84,53 +76,53 @@
 	// Removed selectSubcategory function - subcategories now handled by CategoryDropdown
 </script>
 
-<section class="pt-2 md:pt-3 pb-6 md:pb-8">
+<section class="pt-3 md:pt-4 pb-1 md:pb-2 bg-gradient-to-b from-orange-50 to-white">
 	<div class="container px-4">
-		<!-- Main Categories with Icon Circles -->
-		<div class="mb-2">
-			<div class="flex items-start gap-4 md:gap-6 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory justify-start md:justify-center">
+		<!-- Main Categories with Circle Images -->
+		<div class="mb-1">
+			<div class="flex items-start gap-3 md:gap-5 overflow-x-auto pb-3 scrollbar-hide snap-x snap-mandatory justify-start md:justify-center">
 				{#each mainCategories as category}
 					<button
 						onclick={() => selectCategory(category.value)}
 						onmouseenter={() => hoveredCategory = category.value}
 						onmouseleave={() => hoveredCategory = ''}
-						class="group flex-shrink-0 text-center transition-all duration-300 snap-center rounded-xl p-3"
+						class="group flex-shrink-0 text-center transition-all duration-300 snap-center rounded-lg p-2"
 						style="outline: none !important; -webkit-tap-highlight-color: transparent !important; box-shadow: none !important;"
 					>
-						<!-- Category Icon Container -->
-						<div class="relative mb-3 md:mb-4">
-							<!-- Icon Circle -->
+						<!-- Category Image Container -->
+						<div class="relative mb-2 md:mb-3">
+							
+							<!-- Image Circle -->
 							<div class={cn(
-								"relative w-18 h-18 md:w-28 md:h-28 mx-auto rounded-full transition-all duration-300 border-3 flex items-center justify-center",
-								category.bgColor,
+								"relative w-16 h-16 md:w-24 md:h-24 mx-auto overflow-hidden rounded-full transition-all duration-300 border-2",
 								selectedCategory === category.value 
-									? "border-orange-500 shadow-lg scale-105 ring-2 ring-orange-200" 
+									? "border-orange-500 shadow-lg scale-105" 
 									: hoveredCategory === category.value
-										? "border-orange-300 shadow-lg scale-110 ring-1 ring-orange-100"
-										: "border-white shadow-md hover:shadow-lg hover:scale-105"
+										? "border-orange-300 shadow-md scale-105"
+										: "border-gray-200 shadow-sm hover:shadow-md"
 							)}>
-								<!-- Emoji Icon -->
-								<span class={cn(
-									"text-2xl md:text-4xl transition-transform duration-300 select-none",
-									hoveredCategory === category.value && "scale-110"
-								)}>
-									{category.icon}
-								</span>
+								<img
+									src={category.image}
+									alt={category.name}
+									class={cn(
+										"h-full w-full object-cover transition-transform duration-300",
+										hoveredCategory === category.value && "scale-110"
+									)}
+									loading="lazy"
+								/>
 								
-								<!-- Glow effect on hover -->
+								<!-- Overlay on hover -->
 								<div class={cn(
-									"absolute inset-0 rounded-full bg-gradient-to-t",
-									category.color,
-									"opacity-0 transition-opacity duration-300",
-									hoveredCategory === category.value ? "opacity-20" : "opacity-0"
+									"absolute inset-0 bg-gradient-to-t from-black/30 to-transparent transition-opacity duration-300",
+									hoveredCategory === category.value ? "opacity-100" : "opacity-0"
 								)}></div>
 							</div>
 						</div>
 						
 						<!-- Category Info -->
-						<div class="min-w-[72px] md:min-w-[112px]">
+						<div class="min-w-[64px] md:min-w-[96px]">
 							<h3 class={cn(
-								"text-sm md:text-base font-semibold transition-colors duration-200 mb-1",
+								"text-sm md:text-base font-medium transition-colors duration-200 mb-1",
 								selectedCategory === category.value 
 									? "text-orange-600" 
 									: hoveredCategory === category.value
@@ -138,8 +130,8 @@
 										: "text-gray-900"
 							)}>{category.name}</h3>
 							<p class={cn(
-								"text-xs md:text-sm font-medium transition-colors duration-200",
-								hoveredCategory === category.value ? "text-gray-600" : "text-gray-500"
+								"text-xs md:text-sm transition-colors duration-200",
+								hoveredCategory === category.value ? "text-gray-600" : "text-gray-400"
 							)}>{category.count}</p>
 						</div>
 					</button>
