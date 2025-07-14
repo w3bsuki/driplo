@@ -106,14 +106,18 @@
 				<MessageCircle class="h-5 w-5 text-muted-foreground hover:text-foreground" />
 				<span class="sr-only">Messages</span>
 			</a>
-			<a href={$user ? ($profile?.username ? `/profile/${$profile.username}` : '/profile') : '/login'} class="relative p-2 hover:bg-orange-50 rounded-lg transition-colors group">
+			<a href={$user ? ($profile?.username ? `/profile/${$profile.username}` : '/profile') : '/login'} class="relative hover:bg-orange-50 rounded-full transition-colors group">
 				{#if $user}
-					<div class="h-8 w-8 rounded-full bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center shadow-sm">
-						<User class="h-4 w-4 text-white" />
-					</div>
+					{#if $profile?.avatar_url}
+						<img src={$profile.avatar_url} alt="Profile" class="h-9 w-9 rounded-full border-2 border-orange-200 group-hover:border-orange-300 transition-colors object-cover" />
+					{:else}
+						<div class="h-9 w-9 rounded-full bg-gradient-to-br from-orange-400 via-orange-500 to-orange-600 flex items-center justify-center shadow-md border border-orange-300 group-hover:shadow-lg transition-all">
+							<span class="text-white font-semibold text-sm">{($profile?.full_name || $profile?.username || $user.email)?.charAt(0).toUpperCase()}</span>
+						</div>
+					{/if}
 				{:else}
-					<div class="h-8 w-8 rounded-full border-2 border-orange-200 hover:border-orange-300 bg-white flex items-center justify-center group-hover:bg-orange-50 transition-colors">
-						<User class="h-4 w-4 text-orange-600" />
+					<div class="h-9 w-9 rounded-full border-2 border-orange-200 hover:border-orange-400 bg-white flex items-center justify-center group-hover:bg-orange-50 transition-all shadow-sm hover:shadow-md">
+						<User class="h-5 w-5 text-orange-600" />
 					</div>
 				{/if}
 				<span class="sr-only">{$user ? 'Profile' : 'Sign in'}</span>
@@ -122,14 +126,18 @@
 
 		<!-- Mobile Actions -->
 		<div class="flex md:hidden items-center gap-2 ml-auto">
-			<a href={$user ? ($profile?.username ? `/profile/${$profile.username}` : '/profile') : '/login'} class="relative p-2 hover:bg-orange-50 rounded-lg transition-colors group">
+			<a href={$user ? ($profile?.username ? `/profile/${$profile.username}` : '/profile') : '/login'} class="relative hover:bg-orange-50 rounded-full transition-colors group">
 				{#if $user}
-					<div class="h-8 w-8 rounded-full bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center shadow-sm">
-						<User class="h-4 w-4 text-white" />
-					</div>
+					{#if $profile?.avatar_url}
+						<img src={$profile.avatar_url} alt="Profile" class="h-9 w-9 rounded-full border-2 border-orange-200 group-hover:border-orange-300 transition-colors object-cover" />
+					{:else}
+						<div class="h-9 w-9 rounded-full bg-gradient-to-br from-orange-400 via-orange-500 to-orange-600 flex items-center justify-center shadow-md border border-orange-300 group-hover:shadow-lg transition-all">
+							<span class="text-white font-semibold text-sm">{($profile?.full_name || $profile?.username || $user.email)?.charAt(0).toUpperCase()}</span>
+						</div>
+					{/if}
 				{:else}
-					<div class="h-8 w-8 rounded-full border-2 border-orange-200 hover:border-orange-300 bg-white flex items-center justify-center group-hover:bg-orange-50 transition-colors">
-						<User class="h-4 w-4 text-orange-600" />
+					<div class="h-9 w-9 rounded-full border-2 border-orange-200 hover:border-orange-400 bg-white flex items-center justify-center group-hover:bg-orange-50 transition-all shadow-sm hover:shadow-md">
+						<User class="h-5 w-5 text-orange-600" />
 					</div>
 				{/if}
 				<span class="sr-only">{$user ? 'Profile' : 'Sign in'}</span>

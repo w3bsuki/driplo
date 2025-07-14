@@ -137,8 +137,8 @@
 					</div>
 					
 					<!-- Trending Category Links -->
-					<div class="border-t border-orange-100 py-2 flex items-center gap-3 overflow-x-auto">
-						<div class="flex items-center gap-3 px-4">
+					<div class="border-t border-orange-100 py-2">
+						<div class="mx-4 flex items-center gap-3 overflow-x-auto">
 							<span class="text-xs text-gray-500 flex-shrink-0 hidden md:block">Trending:</span>
 							{#each trendingCategories as category}
 								<button

@@ -13,30 +13,30 @@
 	let selectedCategory = $state('');
 	let hoveredCategory = $state('');
 
-	// Category images mapping
-	const categoryImages: Record<string, { image: string; color: string }> = {
+	// Category emojis mapping
+	const categoryEmojis: Record<string, { emoji: string; color: string }> = {
 		women: {
-			image: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=400&h=400&fit=crop',
+			emoji: '👩',
 			color: 'from-pink-400 to-purple-400'
 		},
 		men: {
-			image: 'https://images.unsplash.com/photo-1516257984-b1b4d707412e?w=400&h=400&fit=crop',
+			emoji: '👨',
 			color: 'from-blue-400 to-indigo-400'
 		},
 		kids: {
-			image: 'https://images.unsplash.com/photo-1503919545889-aef636e10ad4?w=400&h=400&fit=crop',
+			emoji: '🧸',
 			color: 'from-green-400 to-teal-400'
 		},
 		designer: {
-			image: 'https://images.unsplash.com/photo-1609709295948-17d77cb2a69b?w=400&h=400&fit=crop',
+			emoji: '💎',
 			color: 'from-yellow-400 to-orange-400'
 		},
 		shoes: {
-			image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=400&fit=crop',
+			emoji: '👟',
 			color: 'from-red-400 to-pink-400'
 		},
 		bags: {
-			image: 'https://images.unsplash.com/photo-1590874103328-eac38a683ce7?w=400&h=400&fit=crop',
+			emoji: '👜',
 			color: 'from-purple-400 to-pink-400'
 		}
 	};
@@ -46,7 +46,7 @@
 			name: 'All',
 			value: '',
 			slug: '',
-			image: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&h=400&fit=crop',
+			emoji: '🛍️',
 			count: 'Browse all',
 			color: 'from-orange-400 to-pink-400'
 		},
@@ -54,9 +54,9 @@
 			name: cat.name,
 			value: cat.slug,
 			slug: cat.slug,
-			image: categoryImages[cat.slug]?.image || 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&h=400&fit=crop',
+			emoji: categoryEmojis[cat.slug]?.emoji || '📦',
 			count: `${cat.product_count?.[0]?.count || 0} items`,
-			color: categoryImages[cat.slug]?.color || 'from-gray-400 to-gray-600'
+			color: categoryEmojis[cat.slug]?.color || 'from-gray-400 to-gray-600'
 		}))
 	]);
 
@@ -89,33 +89,25 @@
 						class="group flex-shrink-0 text-center transition-all duration-300 snap-center rounded-lg p-2"
 						style="outline: none !important; -webkit-tap-highlight-color: transparent !important; box-shadow: none !important;"
 					>
-						<!-- Category Image Container -->
+						<!-- Category Emoji Container -->
 						<div class="relative mb-2 md:mb-3">
 							
-							<!-- Image Circle -->
+							<!-- Emoji Circle -->
 							<div class={cn(
-								"relative w-16 h-16 md:w-24 md:h-24 mx-auto overflow-hidden rounded-full transition-all duration-300 border-2",
+								"relative w-16 h-16 md:w-24 md:h-24 mx-auto rounded-full transition-all duration-300 border-2 flex items-center justify-center",
+								`bg-gradient-to-br ${category.color}`,
 								selectedCategory === category.value 
 									? "border-orange-500 shadow-lg scale-105" 
 									: hoveredCategory === category.value
 										? "border-orange-300 shadow-md scale-105"
-										: "border-gray-200 shadow-sm hover:shadow-md"
+										: "border-white/30 shadow-sm hover:shadow-md"
 							)}>
-								<img
-									src={category.image}
-									alt={category.name}
-									class={cn(
-										"h-full w-full object-cover transition-transform duration-300",
-										hoveredCategory === category.value && "scale-110"
-									)}
-									loading="lazy"
-								/>
-								
-								<!-- Overlay on hover -->
-								<div class={cn(
-									"absolute inset-0 bg-gradient-to-t from-black/30 to-transparent transition-opacity duration-300",
-									hoveredCategory === category.value ? "opacity-100" : "opacity-0"
-								)}></div>
+								<span class={cn(
+									"text-2xl md:text-4xl transition-transform duration-300",
+									hoveredCategory === category.value && "scale-110"
+								)}>
+									{category.emoji}
+								</span>
 							</div>
 						</div>
 						
