@@ -226,7 +226,6 @@
     
     /* Prevent iOS bounce/elastic scrolling */
     body {
-      position: fixed;
       width: 100%;
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
