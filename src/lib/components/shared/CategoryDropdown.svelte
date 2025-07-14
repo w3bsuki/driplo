@@ -151,7 +151,7 @@
 {#if isOpen}
 	<div 
 		class={cn(
-			"absolute top-full left-0 mt-2 w-80 md:w-96 bg-white rounded-2xl shadow-xl border border-gray-200 z-50 overflow-hidden",
+			"absolute top-full left-0 mt-2 w-80 md:w-96 bg-white rounded-2xl shadow-xl border border-gray-200 z-[100] overflow-hidden",
 			className
 		)}
 		use:clickOutside={onClose}

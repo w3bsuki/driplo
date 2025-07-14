@@ -70,16 +70,16 @@
 		<div class="max-w-3xl mx-auto">
 			
 			<!-- Search Bar -->
-			<div class="relative group">
+			<div class="relative group overflow-visible">
 				<div class={cn(
 					"absolute inset-0 bg-gradient-to-r from-orange-400 to-orange-600 rounded-2xl blur-xl opacity-20 transition-all duration-300",
 					isFocused && "opacity-30 blur-2xl"
 				)}></div>
 				
 				<div class="relative bg-white rounded-2xl shadow-lg border border-orange-200 transition-all duration-300 hover:shadow-xl hover:border-orange-300">
-					<div class="flex items-center">
+					<div class="flex items-center min-w-0">
 						<!-- Category Dropdown Button -->
-						<div class="relative pl-4 pr-3">
+						<div class="relative flex-shrink-0 pl-4 pr-3 z-[101]">
 							<button
 								data-categories-button
 								onclick={toggleCategoryDropdown}
@@ -109,26 +109,31 @@
 						</div>
 						
 						<!-- Divider -->
-						<div class="w-px h-6 bg-orange-200"></div>
+						<div class="w-px h-6 bg-orange-200 flex-shrink-0"></div>
 						
+						<!-- Search Input -->
+						<div class="flex-1 min-w-0">
+							<input
+								type="search"
+								placeholder="Search for items, brands, or users..."
+								bind:value={searchQuery}
+								onfocus={() => isFocused = true}
+								onblur={() => isFocused = false}
+								onkeydown={(e) => e.key === 'Enter' && handleSearch()}
+								class="w-full py-4 md:py-4.5 pl-4 pr-4 text-sm md:text-base placeholder:text-gray-400 focus:outline-none bg-transparent focus:placeholder:text-orange-400"
+							/>
+						</div>
 						
-						<input
-							type="search"
-							placeholder="Search for items, brands, or users..."
-							bind:value={searchQuery}
-							onfocus={() => isFocused = true}
-							onblur={() => isFocused = false}
-							onkeydown={(e) => e.key === 'Enter' && handleSearch()}
-							class="flex-1 py-4 md:py-4.5 pl-4 pr-4 text-sm md:text-base placeholder:text-gray-400 focus:outline-none bg-transparent focus:placeholder:text-orange-400"
-						/>
-						
-						<button
-							onclick={handleSearch}
-							class="mr-3 p-2.5 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-all duration-200 active:scale-95 flex items-center justify-center"
-							aria-label="Search"
-						>
-							<Search class="h-4 w-4" />
-						</button>
+						<!-- Search Button -->
+						<div class="flex-shrink-0 pr-3">
+							<button
+								onclick={handleSearch}
+								class="p-2.5 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-all duration-200 active:scale-95 flex items-center justify-center"
+								aria-label="Search"
+							>
+								<Search class="h-4 w-4" />
+							</button>
+						</div>
 					</div>
 					
 					<!-- Trending Category Links -->

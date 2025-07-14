@@ -78,8 +78,8 @@
 		</div>
 		
 		<!-- Logo -->
-		<a href="/" class="flex items-center space-x-2 mr-4 md:mr-6">
-			<span class="text-xl md:text-2xl font-bold text-primary hover:text-primary/90 transition-colors tracking-tight">Driplo</span>
+		<a href="/" class="flex items-center space-x-2 mr-4 md:mr-6 md:ml-0 -ml-3">
+			<span class="text-xl md:text-2xl font-black text-primary hover:text-primary/90 transition-colors tracking-tighter bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent hover:from-orange-600 hover:to-orange-700 drop-shadow-sm">Driplo</span>
 		</a>
 
 		<!-- Desktop Search Bar -->
@@ -171,7 +171,7 @@
 		></button>
 		
 		<!-- Slide-out Panel -->
-		<div class="fixed top-0 right-0 bottom-0 z-[100] w-72 max-w-[85vw] shadow-2xl border-l border-gray-200" style="background-color: #ffffff !important; opacity: 1 !important;">
+		<div class="fixed top-0 left-0 bottom-0 z-[100] w-72 max-w-[85vw] shadow-2xl border-r border-gray-200" style="background-color: #ffffff !important; opacity: 1 !important;">
 			<div class="flex h-full flex-col">
 				<!-- Header -->
 				<div class="flex items-center justify-between px-6 py-4 border-b border-gray-200">

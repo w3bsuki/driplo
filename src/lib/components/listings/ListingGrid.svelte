@@ -5,11 +5,29 @@
 	import InfiniteScroll from '$lib/components/ui/InfiniteScroll.svelte';
 	import type { Database } from '$lib/types/database'
 	
+	type ListingData = {
+		id: string;
+		title: string;
+		price: number;
+		size?: string;
+		brand?: string;
+		images?: string[];
+		seller?: {
+			username: string;
+			avatar_url?: string;
+		};
+		favorite_count?: number;
+		condition?: 'new' | 'good' | 'worn';
+		status: string;
+		created_at: string;
+		view_count?: number;
+	};
+
 	interface Props {
 		title?: string;
 		limit?: number;
 		orderBy?: 'created_at' | 'price' | 'view_count';
-		listings?: any[]; // Pre-loaded listings from server
+		listings?: ListingData[]; // Pre-loaded listings from server
 		showLoading?: boolean; // Override loading state
 		infiniteScroll?: boolean; // Enable infinite scroll
 		hasMore?: boolean; // Has more items to load
@@ -27,7 +45,7 @@
 		onLoadMore
 	}: Props = $props();
 	
-	let listings = $state<any[]>([])
+	let listings = $state<ListingData[]>([])
 	let loading = $state(showLoading)
 	
 	// If server listings provided, use them; otherwise load client-side
@@ -76,7 +94,7 @@
 		}
 	}
 	
-	function transformListings(rawListings: any[]) {
+	function transformListings(rawListings: ListingData[]) {
 		return rawListings.map(listing => ({
 			id: listing.id,
 			title: listing.title,
@@ -109,8 +127,8 @@
 			</div>
 		{:else if listings.length > 0}
 			<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-3 md:gap-4">
-				{#each listings as listing}
-					<ListingCard {...listing} />
+				{#each listings as listing, index}
+					<ListingCard {...listing} eagerLoading={index < 8} />
 				{/each}
 			</div>
 			
