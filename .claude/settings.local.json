@@ -12,7 +12,10 @@
       "WebFetch(domain:supabase.com)",
       "WebFetch(domain:www.vinted.co.uk)",
       "Bash(npm run build:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "WebFetch(domain:inlang.com)",
+      "WebFetch(domain:leovoon.github.io)",
+      "WebFetch(domain:www.npmjs.com)"
     ],
     "deny": []
   }

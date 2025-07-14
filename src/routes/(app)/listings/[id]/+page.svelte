@@ -1,501 +1,473 @@
 <script lang="ts">
-	import { onMount } from 'svelte'
-	import { goto } from '$app/navigation'
-	import { page } from '$app/stores'
-	import { user } from '$lib/stores/auth'
-	import { supabase } from '$lib/supabase'
-	import { Button } from '$lib/components/ui'
-	import { Badge } from '$lib/components/ui/badge'
-	import { Card } from '$lib/components/ui/card'
-	import { toast } from 'svelte-sonner'
-	import { 
-		Heart, Share2, ShieldCheck, MapPin, Calendar, 
-		Eye, ArrowLeft, MessageCircle, User, ChevronLeft, 
-		ChevronRight, Star, Package, Truck, CreditCard
-	} from 'lucide-svelte'
-	// Utility function for time formatting
-	function formatTimeAgo(date: string): string {
-		const now = new Date()
-		const past = new Date(date)
-		const diffMs = now.getTime() - past.getTime()
-		const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
-		const diffMonths = Math.floor(diffDays / 30)
-		const diffYears = Math.floor(diffDays / 365)
-		
-		if (diffYears > 0) return `${diffYears} year${diffYears > 1 ? 's' : ''}`
-		if (diffMonths > 0) return `${diffMonths} month${diffMonths > 1 ? 's' : ''}`
-		if (diffDays > 0) return `${diffDays} day${diffDays > 1 ? 's' : ''}`
-		return 'Today'
-	}
-	import { cn } from '$lib/utils'
-	import type { PageData } from './$types'
+	import { page } from '$app/stores';
+	import { onMount } from 'svelte';
+	import { goto } from '$app/navigation';
+	import { formatCurrency } from '$lib/utils/format';
+	import { ChevronLeft, ChevronRight, X, Heart, MessageCircle, Share2, MapPin, Shield, Eye, MoreVertical } from 'lucide-svelte';
+	import { clickOutside } from '$lib/utils/clickOutside';
+	import type { PageData } from './$types';
+	import { cn } from '$lib/utils/cn';
 
-	let { data }: { data: PageData } = $props()
-	
-	// Image gallery state
-	let currentImageIndex = $state(0)
-	let isImageModalOpen = $state(false)
-	let isLiked = $state(false)
-	let likeCount = $state(data.listing.favorite_count || 0)
-	let isLoading = $state(false)
+	export let data: PageData;
 
-	// Reactive computations
-	const images = $derived(data.listing.images as string[] || [])
-	const hasMultipleImages = $derived(images.length > 1)
-	const currentImage = $derived(images[currentImageIndex] || 'https://picsum.photos/400/600?random=placeholder')
-	const formattedPrice = $derived(new Intl.NumberFormat('en-US', {
-		style: 'currency',
-		currency: 'USD'
-	}).format(data.listing.price))
+	$: listing = data.listing;
+	$: currentUser = data.user;
+	$: relatedListings = data.relatedListings;
 
-	// Image navigation
+	let currentImageIndex = 0;
+	let showFullscreen = false;
+	let moreMenuOpen = false;
+	let currentImagePosition = 0;
+
+	$: isOwner = currentUser?.id === listing?.seller_id;
+	$: images = listing?.images || [];
+	$: hasMultipleImages = images.length > 1;
+
 	function nextImage() {
-		currentImageIndex = (currentImageIndex + 1) % images.length
+		if (currentImageIndex < images.length - 1) {
+			currentImageIndex++;
+		}
 	}
 
 	function prevImage() {
-		currentImageIndex = currentImageIndex === 0 ? images.length - 1 : currentImageIndex - 1
+		if (currentImageIndex > 0) {
+			currentImageIndex--;
+		}
 	}
 
-	// Actions
-	async function toggleLike() {
-		if (!$user) {
-			toast.error('Please login to like items')
-			return
+	function selectImage(index: number) {
+		currentImageIndex = index;
+	}
+
+	async function handleLike() {
+		if (!currentUser) {
+			goto('/auth/login');
+			return;
 		}
-
-		isLoading = true
-		try {
-			if (isLiked) {
-				const { error } = await supabase
-					.from('favorites')
-					.delete()
-					.eq('user_id', $user.id)
-					.eq('listing_id', data.listing.id)
-
-				if (error) throw error
-				isLiked = false
-				likeCount--
-			} else {
-				const { error } = await supabase
-					.from('favorites')
-					.insert({
-						user_id: $user.id,
-						listing_id: data.listing.id
-					})
-
-				if (error) throw error
-				isLiked = true
-				likeCount++
-			}
-		} catch (error) {
-			console.error('Error toggling like:', error)
-			toast.error('Failed to update like status')
-		} finally {
-			isLoading = false
-		}
+		// TODO: Implement like functionality
+		console.log('Like listing');
 	}
 
 	async function handleMessage() {
-		if (!$user) {
-			toast.error('Please login to message sellers')
-			return
+		if (!currentUser) {
+			goto('/auth/login');
+			return;
 		}
-
-		if ($user.id === data.listing.seller_id) {
-			toast.error('You cannot message yourself')
-			return
-		}
-
-		// TODO: Implement messaging
-		toast.success('Messaging feature coming soon!')
+		// TODO: Implement message functionality
+		console.log('Message seller');
 	}
 
-	async function handleBuy() {
-		if (!$user) {
-			toast.error('Please login to purchase items')
-			return
-		}
-
-		if ($user.id === data.listing.seller_id) {
-			toast.error('You cannot buy your own item')
-			return
-		}
-
-		// TODO: Implement purchase flow
-		toast.success('Purchase feature coming soon!')
-	}
-
-	function handleShare() {
+	async function handleShare() {
 		if (navigator.share) {
-			navigator.share({
-				title: data.listing.title,
-				text: `Check out this ${data.listing.title} on Threadly`,
-				url: window.location.href
-			})
-		} else {
-			navigator.clipboard.writeText(window.location.href)
-			toast.success('Link copied to clipboard!')
+			try {
+				await navigator.share({
+					title: listing?.title,
+					text: listing?.description,
+					url: window.location.href
+				});
+			} catch (err) {
+				console.log('Error sharing:', err);
+			}
 		}
 	}
 
-	// Check if user has liked this listing
-	onMount(async () => {
-		if ($user) {
-			const { data: like } = await supabase
-				.from('favorites')
-				.select('id')
-				.eq('user_id', $user.id)
-				.eq('listing_id', data.listing.id)
-				.single()
-
-			isLiked = !!like
+	async function handleBuyNow() {
+		if (!currentUser) {
+			goto('/auth/login');
+			return;
 		}
-	})
-
-	// Condition badge styling
-	const getConditionBadge = (condition: string) => {
-		const styles = {
-			'new': 'bg-green-100 text-green-800',
-			'like_new': 'bg-green-100 text-green-700',
-			'good': 'bg-yellow-100 text-yellow-800',
-			'fair': 'bg-orange-100 text-orange-800',
-			'poor': 'bg-red-100 text-red-800'
-		}
-		return styles[condition as keyof typeof styles] || 'bg-gray-100 text-gray-800'
+		// TODO: Implement buy now functionality
+		console.log('Buy now');
 	}
+
+	function handleSwipe(e: TouchEvent) {
+		const touch = e.touches[0];
+		if (!touch) return;
+
+		const startX = touch.clientX;
+		const imageContainer = e.currentTarget as HTMLElement;
+
+		function handleMove(e: TouchEvent) {
+			const touch = e.touches[0];
+			const deltaX = touch.clientX - startX;
+			
+			if (Math.abs(deltaX) > 50) {
+				if (deltaX > 0 && currentImageIndex > 0) {
+					prevImage();
+				} else if (deltaX < 0 && currentImageIndex < images.length - 1) {
+					nextImage();
+				}
+				imageContainer.removeEventListener('touchmove', handleMove);
+			}
+		}
+
+		imageContainer.addEventListener('touchmove', handleMove);
+		imageContainer.addEventListener('touchend', () => {
+			imageContainer.removeEventListener('touchmove', handleMove);
+		}, { once: true });
+	}
+
+	// Format view count
+	function formatViews(count: number): string {
+		if (count >= 1000000) return `${(count / 1000000).toFixed(1)}M`;
+		if (count >= 1000) return `${(count / 1000).toFixed(1)}K`;
+		return count.toString();
+	}
+
+	// Simple time ago function
+	function timeAgo(date: Date): string {
+		const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000);
+		
+		if (seconds < 60) return 'just now';
+		const minutes = Math.floor(seconds / 60);
+		if (minutes < 60) return `${minutes}m ago`;
+		const hours = Math.floor(minutes / 60);
+		if (hours < 24) return `${hours}h ago`;
+		const days = Math.floor(hours / 24);
+		if (days < 7) return `${days}d ago`;
+		const weeks = Math.floor(days / 7);
+		if (weeks < 4) return `${weeks}w ago`;
+		const months = Math.floor(days / 30);
+		if (months < 12) return `${months}mo ago`;
+		const years = Math.floor(days / 365);
+		return `${years}y ago`;
+	}
+
+	onMount(() => {
+		// Increment view count
+		// TODO: Implement view count increment
+	});
 </script>
 
 <svelte:head>
-	<title>{data.listing.title} - Threadly</title>
-	<meta name="description" content={data.listing.description.slice(0, 160)} />
-	<meta property="og:title" content={data.listing.title} />
-	<meta property="og:description" content={data.listing.description.slice(0, 160)} />
-	<meta property="og:image" content={currentImage} />
-	<meta property="og:url" content={$page.url.href} />
-	<meta property="og:type" content="product" />
+	<title>{listing?.title || 'Product'} - Driplo</title>
+	<meta name="description" content={listing?.description || 'Check out this item on Driplo'} />
 </svelte:head>
 
-<div class="min-h-screen bg-background">
-	<!-- Mobile Header -->
-	<div class="sticky top-0 z-40 bg-background/95 backdrop-blur-sm border-b md:hidden">
-		<div class="flex items-center justify-between p-4">
-			<button 
-				onclick={() => history.back()}
-				class="p-2 hover:bg-muted rounded-lg transition-colors"
-			>
-				<ArrowLeft class="w-5 h-5" />
-			</button>
-			<div class="flex items-center gap-2">
-				<button 
-					onclick={handleShare}
-					class="p-2 hover:bg-muted rounded-lg transition-colors"
-				>
-					<Share2 class="w-5 h-5" />
-				</button>
-				<button 
-					onclick={toggleLike}
-					disabled={isLoading}
-					class={cn(
-						"p-2 rounded-lg transition-colors",
-						isLiked ? "text-red-500" : "hover:bg-muted"
-					)}
-				>
-					<Heart class={cn("w-5 h-5", isLiked && "fill-current")} />
-				</button>
-			</div>
-		</div>
-	</div>
-
-	<div class="container max-w-7xl mx-auto px-4 py-6">
-		<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-			<!-- Image Gallery -->
-			<div class="space-y-4">
-				<!-- Main Image -->
-				<div class="relative aspect-[4/5] rounded-2xl overflow-hidden bg-muted">
-					<img 
-						src={currentImage}
-						alt={data.listing.title}
-						class="w-full h-full object-cover cursor-zoom-in"
-						onclick={() => isImageModalOpen = true}
-					/>
-					
-					{#if hasMultipleImages}
-						<button 
-							onclick={prevImage}
-							class="absolute left-4 top-1/2 -translate-y-1/2 p-2 bg-black/50 text-white rounded-full hover:bg-black/70 transition-colors"
+{#if listing}
+	<div class="min-h-screen bg-gray-50">
+		<!-- Social Media Style Layout -->
+		<div class="max-w-4xl mx-auto bg-white">
+			<!-- Seller Header - Like Instagram/TikTok -->
+			<div class="sticky top-0 z-20 bg-white border-b">
+				<div class="flex items-center justify-between p-4">
+					<div class="flex items-center gap-3">
+						<!-- Back button on mobile -->
+						<button
+							on:click={() => window.history.back()}
+							class="md:hidden -ml-2 p-1.5 rounded-full hover:bg-gray-100"
 						>
 							<ChevronLeft class="w-5 h-5" />
 						</button>
-						<button 
-							onclick={nextImage}
-							class="absolute right-4 top-1/2 -translate-y-1/2 p-2 bg-black/50 text-white rounded-full hover:bg-black/70 transition-colors"
+						
+						<!-- Seller info -->
+						<a href="/users/{listing.seller.username}" class="flex items-center gap-3">
+							<img
+								src={listing.seller.avatar_url || '/default-avatar.png'}
+								alt={listing.seller.username}
+								class="w-10 h-10 rounded-full object-cover"
+							/>
+							<div>
+								<div class="flex items-center gap-1.5">
+									<span class="font-semibold text-sm">{listing.seller.username}</span>
+									{#if listing.seller.verification_badges?.includes('verified')}
+										<Shield class="w-4 h-4 text-blue-500" />
+									{/if}
+								</div>
+								<div class="text-xs text-gray-500">
+									{timeAgo(new Date(listing.created_at))}
+								</div>
+							</div>
+						</a>
+
+						{#if !isOwner}
+							<button
+								on:click={() => console.log('Follow')}
+								class="ml-auto px-4 py-1.5 bg-black text-white rounded-full text-sm font-medium hover:bg-gray-800 transition-colors"
+							>
+								Follow
+							</button>
+						{/if}
+					</div>
+
+					<!-- More menu -->
+					<div class="relative">
+						<button
+							on:click={() => moreMenuOpen = !moreMenuOpen}
+							class="p-1.5 rounded-full hover:bg-gray-100"
+						>
+							<MoreVertical class="w-5 h-5" />
+						</button>
+						
+						{#if moreMenuOpen}
+							<div
+								use:clickOutside
+								on:click_outside={() => moreMenuOpen = false}
+								class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border py-1"
+							>
+								<button class="w-full px-4 py-2 text-left hover:bg-gray-50 text-sm">
+									Report
+								</button>
+								{#if isOwner}
+									<button class="w-full px-4 py-2 text-left hover:bg-gray-50 text-sm">
+										Edit
+									</button>
+									<button class="w-full px-4 py-2 text-left hover:bg-gray-50 text-sm text-red-600">
+										Delete
+									</button>
+								{/if}
+							</div>
+						{/if}
+					</div>
+				</div>
+			</div>
+
+			<!-- Product Image - Optimized for Mobile -->
+			<div class="relative bg-black">
+				<div 
+					class="relative aspect-square md:aspect-[4/3] overflow-hidden"
+					on:touchstart={handleSwipe}
+				>
+					<img
+						src={images[currentImageIndex]}
+						alt="{listing.title} - Image {currentImageIndex + 1}"
+						class="w-full h-full object-contain"
+					/>
+
+					<!-- Image navigation -->
+					{#if hasMultipleImages}
+						<!-- Desktop navigation arrows -->
+						<button
+							on:click={prevImage}
+							disabled={currentImageIndex === 0}
+							class="hidden md:flex absolute left-4 top-1/2 -translate-y-1/2 p-2 bg-white/80 rounded-full hover:bg-white disabled:opacity-50 disabled:cursor-not-allowed"
+						>
+							<ChevronLeft class="w-5 h-5" />
+						</button>
+						
+						<button
+							on:click={nextImage}
+							disabled={currentImageIndex === images.length - 1}
+							class="hidden md:flex absolute right-4 top-1/2 -translate-y-1/2 p-2 bg-white/80 rounded-full hover:bg-white disabled:opacity-50 disabled:cursor-not-allowed"
 						>
 							<ChevronRight class="w-5 h-5" />
 						</button>
-						
-						<!-- Image Counter -->
-						<div class="absolute bottom-4 right-4 px-3 py-1 bg-black/50 text-white text-sm rounded-full">
-							{currentImageIndex + 1} / {images.length}
+
+						<!-- Image indicators -->
+						<div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5">
+							{#each images as _, i}
+								<button
+									on:click={() => selectImage(i)}
+									class={cn(
+										"w-1.5 h-1.5 rounded-full transition-all",
+										i === currentImageIndex ? "bg-white w-6" : "bg-white/50"
+									)}
+								/>
+							{/each}
+						</div>
+					{/if}
+
+					<!-- Image counter -->
+					{#if hasMultipleImages}
+						<div class="absolute top-4 right-4 px-2 py-1 bg-black/50 text-white text-xs rounded-full">
+							{currentImageIndex + 1}/{images.length}
 						</div>
 					{/if}
 				</div>
 
-				<!-- Thumbnail Strip -->
-				{#if hasMultipleImages}
-					<div class="flex gap-2 overflow-x-auto pb-2">
-						{#each images as image, index}
+				<!-- Engagement bar - Instagram style -->
+				<div class="bg-white border-b">
+					<div class="flex items-center justify-between p-4">
+						<div class="flex items-center gap-4">
 							<button
-								onclick={() => currentImageIndex = index}
-								class={cn(
-									"flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-colors",
-									currentImageIndex === index ? "border-primary" : "border-transparent"
-								)}
+								on:click={handleLike}
+								class="p-2 -m-2 hover:bg-gray-100 rounded-full transition-colors"
 							>
-								<img 
-									src={image}
-									alt={`${data.listing.title} ${index + 1}`}
-									class="w-full h-full object-cover"
-								/>
+								<Heart class="w-6 h-6" />
 							</button>
-						{/each}
+							
+							<button
+								on:click={handleMessage}
+								class="p-2 -m-2 hover:bg-gray-100 rounded-full transition-colors"
+							>
+								<MessageCircle class="w-6 h-6" />
+							</button>
+							
+							<button
+								on:click={handleShare}
+								class="p-2 -m-2 hover:bg-gray-100 rounded-full transition-colors"
+							>
+								<Share2 class="w-6 h-6" />
+							</button>
+						</div>
+
+						<!-- Price - Always visible -->
+						<div class="text-xl font-bold">
+							{formatCurrency(listing.price)}
+						</div>
 					</div>
-				{/if}
+
+					<!-- View count and likes -->
+					<div class="px-4 pb-3">
+						<div class="flex items-center gap-3 text-sm text-gray-600">
+							<span class="flex items-center gap-1">
+								<Eye class="w-4 h-4" />
+								{formatViews(listing.view_count || 0)} views
+							</span>
+							<span>•</span>
+							<span>{listing.likes_count || 0} likes</span>
+						</div>
+					</div>
+				</div>
 			</div>
 
 			<!-- Product Details -->
-			<div class="space-y-6">
-				<!-- Price & Title -->
+			<div class="p-4 space-y-4">
+				<!-- Title and condition -->
 				<div>
-					<div class="flex items-start justify-between mb-2">
-						<h1 class="text-2xl md:text-3xl font-bold leading-tight">{data.listing.title}</h1>
-						<!-- Desktop Actions -->
-						<div class="hidden md:flex items-center gap-2">
-							<button 
-								onclick={handleShare}
-								class="p-2 hover:bg-muted rounded-lg transition-colors"
-							>
-								<Share2 class="w-5 h-5" />
-							</button>
-							<button 
-								onclick={toggleLike}
-								disabled={isLoading}
-								class={cn(
-									"p-2 rounded-lg transition-colors",
-									isLiked ? "text-red-500" : "hover:bg-muted"
-								)}
-							>
-								<Heart class={cn("w-5 h-5", isLiked && "fill-current")} />
-							</button>
-						</div>
-					</div>
-					<div class="text-3xl font-bold text-primary mb-4">{formattedPrice}</div>
-					
-					<!-- Quick Details -->
-					<div class="flex flex-wrap gap-2 mb-4">
-						<Badge class={getConditionBadge(data.listing.condition)}>
-							{data.listing.condition.replace('_', ' ')}
-						</Badge>
-						{#if data.listing.size}
-							<Badge variant="outline">Size {data.listing.size}</Badge>
-						{/if}
-						{#if data.listing.brand}
-							<Badge variant="outline">{data.listing.brand}</Badge>
-						{/if}
-						{#if data.listing.color}
-							<Badge variant="outline">{data.listing.color}</Badge>
+					<h1 class="text-lg font-semibold">{listing.title}</h1>
+					<div class="flex items-center gap-2 mt-1">
+						<span class={cn(
+							"px-2 py-0.5 rounded-full text-xs font-medium",
+							listing.condition === 'new' ? "bg-green-100 text-green-700" :
+							listing.condition === 'like_new' ? "bg-blue-100 text-blue-700" :
+							listing.condition === 'good' ? "bg-yellow-100 text-yellow-700" :
+							"bg-gray-100 text-gray-700"
+						)}>
+							{listing.condition.replace('_', ' ')}
+						</span>
+						{#if listing.location}
+							<span class="flex items-center gap-1 text-xs text-gray-600">
+								<MapPin class="w-3 h-3" />
+								{listing.location}
+							</span>
 						{/if}
 					</div>
 				</div>
 
-				<!-- Action Buttons -->
-				<div class="flex gap-3">
-					<Button 
-						onclick={handleBuy}
-						class="flex-1 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white"
-						size="lg"
-					>
-						<CreditCard class="w-5 h-5 mr-2" />
-						Buy Now
-					</Button>
-					<Button 
-						onclick={handleMessage}
-						variant="outline"
-						size="lg"
-						class="px-6"
-					>
-						<MessageCircle class="w-5 h-5 mr-2" />
-						Message
-					</Button>
-				</div>
-
-				<!-- Seller Info -->
-				<Card class="p-4">
-					<div class="flex items-center gap-3 mb-3">
-						<div class="w-12 h-12 rounded-full bg-muted overflow-hidden">
-							{#if data.listing.seller.avatar_url}
-								<img 
-									src={data.listing.seller.avatar_url}
-									alt={data.listing.seller.username}
-									class="w-full h-full object-cover"
-								/>
-							{:else}
-								<div class="w-full h-full flex items-center justify-center">
-									<User class="w-6 h-6 text-muted-foreground" />
-								</div>
-							{/if}
+				<!-- Key details in grid -->
+				<div class="grid grid-cols-3 gap-3">
+					{#if listing.size}
+						<div class="text-center p-3 bg-gray-50 rounded-lg">
+							<div class="text-xs text-gray-500">Size</div>
+							<div class="font-medium">{listing.size}</div>
 						</div>
-						<div class="flex-1">
-							<div class="flex items-center gap-2">
-								<h3 class="font-semibold">{data.listing.seller.full_name || data.listing.seller.username}</h3>
-								<ShieldCheck class="w-4 h-4 text-green-500" />
-							</div>
-							<div class="text-sm text-muted-foreground">
-								@{data.listing.seller.username} • {data.listing.seller.followers_count} followers
-							</div>
-						</div>
-						<Button 
-							variant="outline" 
-							size="sm"
-							onclick={() => goto(`/profile/${data.listing.seller.username}`)}
-						>
-							View Profile
-						</Button>
-					</div>
+					{/if}
 					
-					<div class="text-sm text-muted-foreground grid grid-cols-2 gap-4">
-						<div class="flex items-center gap-2">
-							<Package class="w-4 h-4" />
-							<span>{data.listing.seller.listings_count} items</span>
+					{#if listing.brand}
+						<div class="text-center p-3 bg-gray-50 rounded-lg">
+							<div class="text-xs text-gray-500">Brand</div>
+							<div class="font-medium">{listing.brand}</div>
 						</div>
-						<div class="flex items-center gap-2">
-							<Calendar class="w-4 h-4" />
-							<span>Joined {formatTimeAgo(data.listing.seller.created_at)} ago</span>
+					{/if}
+					
+					{#if listing.color}
+						<div class="text-center p-3 bg-gray-50 rounded-lg">
+							<div class="text-xs text-gray-500">Color</div>
+							<div class="font-medium">{listing.color}</div>
 						</div>
-					</div>
-				</Card>
+					{/if}
+				</div>
 
 				<!-- Description -->
-				<div>
-					<h3 class="font-semibold mb-3">Description</h3>
-					<p class="text-muted-foreground whitespace-pre-wrap leading-relaxed">{data.listing.description}</p>
-				</div>
-
-				<!-- Details -->
-				<div>
-					<h3 class="font-semibold mb-3">Details</h3>
-					<div class="grid grid-cols-2 gap-4 text-sm">
-						{#if data.listing.category}
-							<div>
-								<span class="text-muted-foreground">Category:</span>
-								<span class="ml-2">{data.listing.category.icon} {data.listing.category.name}</span>
-							</div>
-						{/if}
-						{#if data.listing.location}
-							<div class="flex items-center">
-								<MapPin class="w-4 h-4 text-muted-foreground mr-1" />
-								<span>{data.listing.location}</span>
-							</div>
-						{/if}
-						<div class="flex items-center">
-							<Eye class="w-4 h-4 text-muted-foreground mr-1" />
-							<span>{data.listing.view_count} views</span>
-						</div>
-						<div class="flex items-center">
-							<Heart class="w-4 h-4 text-muted-foreground mr-1" />
-							<span>{likeCount} likes</span>
-						</div>
+				{#if listing.description}
+					<div class="py-3 border-t">
+						<h2 class="font-medium mb-2">Description</h2>
+						<p class="text-sm text-gray-600 whitespace-pre-wrap">{listing.description}</p>
 					</div>
-				</div>
+				{/if}
 
-				<!-- Shipping -->
-				<div>
-					<h3 class="font-semibold mb-3">Shipping</h3>
-					<div class="flex items-center gap-2 text-sm">
-						<Truck class="w-4 h-4 text-muted-foreground" />
-						<span class="capitalize">{data.listing.shipping_type.replace('_', ' ')}</span>
-						{#if data.listing.shipping_cost > 0}
-							<span>• ${data.listing.shipping_cost}</span>
-						{:else}
-							<span>• Free shipping</span>
-						{/if}
-					</div>
-				</div>
-			</div>
-		</div>
-
-		<!-- Related Items -->
-		{#if data.relatedListings.length > 0}
-			<div class="mt-12">
-				<h2 class="text-xl font-bold mb-6">You might also like</h2>
-				<div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-					{#each data.relatedListings as item}
-						<a 
-							href="/listings/{item.id}"
-							class="group block bg-card rounded-xl overflow-hidden hover:shadow-lg transition-all"
+				<!-- Action buttons -->
+				<div class="flex gap-3 pt-3">
+					{#if !isOwner}
+						<button
+							on:click={handleBuyNow}
+							class="flex-1 bg-black text-white py-3 rounded-lg font-medium hover:bg-gray-800 transition-colors"
 						>
-							<div class="aspect-[3/4] bg-muted overflow-hidden">
-								<img 
-									src={(item.images as string[])?.[0] || `https://picsum.photos/400/600?random=${item.id}`}
-									alt={item.title}
-									class="w-full h-full object-cover group-hover:scale-105 transition-transform"
-								/>
-							</div>
-							<div class="p-3">
-								<h3 class="font-medium text-sm line-clamp-2 mb-1">{item.title}</h3>
-								<div class="text-xs text-muted-foreground mb-1">
-									{item.size && `Size ${item.size} • `}{item.brand}
-								</div>
-								<div class="font-bold text-primary">${item.price}</div>
-							</div>
-						</a>
-					{/each}
+							Buy Now
+						</button>
+						<button
+							on:click={handleMessage}
+							class="flex-1 bg-gray-100 text-black py-3 rounded-lg font-medium hover:bg-gray-200 transition-colors"
+						>
+							Message
+						</button>
+					{:else}
+						<button
+							on:click={() => goto(`/listings/${listing.id}/edit`)}
+							class="flex-1 bg-black text-white py-3 rounded-lg font-medium hover:bg-gray-800 transition-colors"
+						>
+							Edit Listing
+						</button>
+					{/if}
 				</div>
-			</div>
-		{/if}
-	</div>
 
-	<!-- Image Modal -->
-	{#if isImageModalOpen}
-		<div class="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4">
-			<button 
-				onclick={() => isImageModalOpen = false}
-				class="absolute top-4 right-4 p-2 text-white hover:bg-white/10 rounded-lg"
-			>
-				<ArrowLeft class="w-6 h-6" />
-			</button>
-			
-			<div class="relative max-w-4xl max-h-full">
-				<img 
-					src={currentImage}
-					alt={data.listing.title}
-					class="max-w-full max-h-full object-contain"
-				/>
-				
-				{#if hasMultipleImages}
-					<button 
-						onclick={prevImage}
-						class="absolute left-4 top-1/2 -translate-y-1/2 p-3 bg-black/50 text-white rounded-full hover:bg-black/70"
-					>
-						<ChevronLeft class="w-6 h-6" />
-					</button>
-					<button 
-						onclick={nextImage}
-						class="absolute right-4 top-1/2 -translate-y-1/2 p-3 bg-black/50 text-white rounded-full hover:bg-black/70"
-					>
-						<ChevronRight class="w-6 h-6" />
-					</button>
+				<!-- Seller profile section -->
+				<div class="py-4 border-t">
+					<a href="/users/{listing.seller.username}" class="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+						<div class="flex items-center gap-3">
+							<img
+								src={listing.seller.avatar_url || '/default-avatar.png'}
+								alt={listing.seller.username}
+								class="w-12 h-12 rounded-full object-cover"
+							/>
+							<div>
+								<div class="font-medium">{listing.seller.full_name || listing.seller.username}</div>
+								<div class="text-sm text-gray-500">
+									{listing.seller.listings_count || 0} listings • {listing.seller.followers_count || 0} followers
+								</div>
+							</div>
+						</div>
+						<ChevronRight class="w-5 h-5 text-gray-400" />
+					</a>
+				</div>
+
+				<!-- Shipping info -->
+				{#if listing.shipping_type}
+					<div class="py-4 border-t">
+						<h3 class="font-medium mb-2">Shipping</h3>
+						<div class="space-y-1 text-sm text-gray-600">
+							<p>{listing.shipping_type.replace('_', ' ')}</p>
+							{#if listing.shipping_price > 0}
+								<p>Shipping cost: {formatCurrency(listing.shipping_price)}</p>
+							{:else}
+								<p>Free shipping</p>
+							{/if}
+						</div>
+					</div>
 				{/if}
 			</div>
+
+			<!-- Related items -->
+			{#if relatedListings?.length > 0}
+				<div class="border-t p-4">
+					<h3 class="font-medium mb-3">More from {listing.seller.username}</h3>
+					<div class="grid grid-cols-3 gap-2">
+						{#each relatedListings.slice(0, 6) as item}
+							<a href="/listings/{item.id}" class="aspect-square bg-gray-100 rounded-lg overflow-hidden">
+								<img
+									src={item.images?.[0] || '/placeholder.png'}
+									alt={item.title}
+									class="w-full h-full object-cover"
+								/>
+							</a>
+						{/each}
+					</div>
+				</div>
+			{/if}
 		</div>
-	{/if}
-</div>
+	</div>
+{:else}
+	<div class="min-h-screen flex items-center justify-center">
+		<p class="text-gray-500">Listing not found</p>
+	</div>
+{/if}
 
 <style>
-	.line-clamp-2 {
-		display: -webkit-box;
-		-webkit-line-clamp: 2;
-		-webkit-box-orient: vertical;
-		overflow: hidden;
+	/* Ensure images don't get too big on desktop */
+	@media (min-width: 768px) {
+		.aspect-square {
+			max-height: 600px;
+		}
 	}
 </style>

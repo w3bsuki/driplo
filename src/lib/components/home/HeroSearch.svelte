@@ -137,13 +137,13 @@
 					</div>
 					
 					<!-- Trending Category Links -->
-					<div class="border-t border-orange-100 py-2">
-						<div class="mx-4 flex items-center gap-3 overflow-x-auto">
+					<div class="border-t border-orange-100 py-3 md:py-2.5">
+						<div class="mx-4 flex items-center gap-2 md:gap-3 overflow-x-auto">
 							<span class="text-xs text-gray-500 flex-shrink-0 hidden md:block">Trending:</span>
 							{#each trendingCategories as category}
 								<button
 									onclick={() => goToCategory(category.value)}
-									class="flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/80 backdrop-blur-sm shadow-sm text-gray-800 hover:bg-white hover:shadow-md transition-all duration-200 text-xs font-medium whitespace-nowrap group"
+									class="flex items-center gap-1 px-3 md:px-2.5 py-1.5 md:py-1 rounded-full bg-white/80 backdrop-blur-sm shadow-sm text-gray-800 hover:bg-white hover:shadow-md transition-all duration-200 text-xs font-medium whitespace-nowrap group"
 								>
 									<span class="text-sm">{category.icon}</span>
 									<span>{category.name}</span>

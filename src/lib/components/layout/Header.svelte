@@ -126,6 +126,10 @@
 
 		<!-- Mobile Actions -->
 		<div class="flex md:hidden items-center gap-2 ml-auto">
+			<a href="/cart" class="relative p-2 hover:bg-orange-50 rounded-lg transition-colors">
+				<span class="text-lg">🛒</span>
+				<span class="sr-only">Cart</span>
+			</a>
 			<a href={$user ? ($profile?.username ? `/profile/${$profile.username}` : '/profile') : '/login'} class="relative hover:bg-orange-50 rounded-full transition-colors group">
 				{#if $user}
 					{#if $profile?.avatar_url}

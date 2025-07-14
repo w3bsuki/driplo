@@ -1,14 +1,23 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { cn } from '$lib/utils';
+	import MobileFiltersDrawer from './MobileFiltersDrawer.svelte';
+	
+	let showFilters = $state(false);
 	
 	const navItems = [
-		{ href: '/messages', emoji: '💬', label: 'Messages' },
 		{ href: '/browse', emoji: '🔍', label: 'Browse' },
 		{ href: '/sell', emoji: '📸', label: 'Sell' },
+		{ href: '#filters', emoji: '⚙️', label: 'Filters', isAction: true },
 		{ href: '/wishlist', emoji: '❤️', label: 'Wishlist' },
-		{ href: '/cart', emoji: '🛒', label: 'Cart' }
+		{ href: '/messages', emoji: '💬', label: 'Messages' }
 	];
+	
+	function handleNavClick(item: any) {
+		if (item.isAction && item.label === 'Filters') {
+			showFilters = true;
+		}
+	}
 </script>
 
 <nav class="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-t border-gray-200 block md:hidden shadow-lg">
@@ -18,7 +27,8 @@
 				{@const isActive = item.href ? $page.url.pathname === item.href : false}
 				
 				<a 
-					href={item.href}
+					href={item.isAction ? undefined : item.href}
+					onclick={item.isAction ? () => handleNavClick(item) : undefined}
 					class={cn(
 						"relative flex flex-col items-center justify-center min-h-[48px] px-3 py-2 rounded-xl transition-all duration-200",
 						item.label === 'Sell'
@@ -46,6 +56,8 @@
 		</div>
 	</div>
 </nav>
+
+<MobileFiltersDrawer isOpen={showFilters} onClose={() => showFilters = false} />
 
 <style>
 	.safe-area-bottom {
