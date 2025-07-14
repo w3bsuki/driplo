@@ -27,11 +27,11 @@
 </script>
 
 <div class="min-h-screen bg-background">
-	<Header />
+	<Header categories={data.categories} />
 	<main class="pb-16 md:pb-0">
 		<slot />
 	</main>
-	<MobileNav />
+	<MobileNav categories={data.categories} />
 </div>
 
 <Toaster richColors position="top-center" />

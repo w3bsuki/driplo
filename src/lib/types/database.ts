@@ -19,36 +19,48 @@ export type Database = {
           created_at: string | null
           description: string | null
           display_order: number | null
-          icon_name: string | null
+          icon: string | null
+          icon_url: string | null
           id: string
           is_active: boolean | null
+          meta_title: string | null
+          meta_description: string | null
           name: string
           parent_id: string | null
           slug: string
+          sort_order: number | null
           updated_at: string | null
         }
         Insert: {
           created_at?: string | null
           description?: string | null
           display_order?: number | null
-          icon_name?: string | null
+          icon?: string | null
+          icon_url?: string | null
           id?: string
           is_active?: boolean | null
+          meta_title?: string | null
+          meta_description?: string | null
           name: string
           parent_id?: string | null
           slug: string
+          sort_order?: number | null
           updated_at?: string | null
         }
         Update: {
           created_at?: string | null
           description?: string | null
           display_order?: number | null
-          icon_name?: string | null
+          icon?: string | null
+          icon_url?: string | null
           id?: string
           is_active?: boolean | null
+          meta_title?: string | null
+          meta_description?: string | null
           name?: string
           parent_id?: string | null
           slug?: string
+          sort_order?: number | null
           updated_at?: string | null
         }
         Relationships: [

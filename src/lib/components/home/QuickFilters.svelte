@@ -16,7 +16,6 @@
 	const quickFilters = [
 		{
 			type: 'price',
-			icon: '💷',
 			options: [
 				{ label: 'Under £20', value: '0-20' },
 				{ label: '£20-50', value: '20-50' },
@@ -26,7 +25,6 @@
 		},
 		{
 			type: 'size',
-			icon: '📏',
 			options: [
 				{ label: 'XS', value: 'xs' },
 				{ label: 'S', value: 's' },
@@ -37,7 +35,6 @@
 		},
 		{
 			type: 'brand',
-			icon: '🏷️',
 			options: [
 				{ label: 'Nike', value: 'nike' },
 				{ label: 'Adidas', value: 'adidas' },
@@ -48,7 +45,6 @@
 		},
 		{
 			type: 'condition',
-			icon: '✨',
 			options: [
 				{ label: 'New', value: 'new' },
 				{ label: 'Like New', value: 'likenew' },
@@ -98,29 +94,11 @@
 	);
 </script>
 
-<section class="bg-gray-50 border-b sticky top-[64px] md:top-[80px] z-30">
-	<div class="container px-4 py-2">
+<section class="bg-white border-t border-b mb-3">
+	<div class="container px-4 py-3">
 		<!-- Mobile Layout -->
 		<div class="md:hidden">
 			<div class="flex items-center gap-2 overflow-x-auto scrollbar-hide">
-				<!-- Filter Toggle Button -->
-				<button
-					onclick={() => showAllFilters = !showAllFilters}
-					class={cn(
-						"flex items-center gap-1.5 px-3 py-1.5 rounded-full border whitespace-nowrap transition-all duration-200 flex-shrink-0 text-xs",
-						activeFilterCount > 0
-							? "bg-orange-500 text-white border-orange-500 hover:bg-orange-600"
-							: "bg-white border-gray-200 hover:border-orange-300 hover:bg-orange-50"
-					)}
-				>
-					<Filter class="h-3.5 w-3.5" />
-					<span class="font-medium">Filters</span>
-					{#if activeFilterCount > 0}
-						<span class="bg-white text-orange-500 rounded-full px-1.5 py-0.5 text-[10px] font-bold">
-							{activeFilterCount}
-						</span>
-					{/if}
-				</button>
 				
 				<!-- Quick Filter Pills -->
 				{#each quickFilters as filter}
@@ -129,10 +107,10 @@
 							value={selectedFilters[filter.type]}
 							onchange={(e) => applyFilter(filter.type, e.currentTarget.value)}
 							class={cn(
-								"appearance-none pl-6 pr-6 py-1.5 rounded-full text-xs font-medium border whitespace-nowrap cursor-pointer transition-all duration-200",
+								"filter-select appearance-none pl-3 pr-7 py-2 rounded-lg text-xs font-medium border cursor-pointer transition-all duration-200 min-w-[80px] outline-none",
 								selectedFilters[filter.type]
-									? "bg-orange-100 border-orange-300 text-orange-700"
-									: "bg-white border-gray-200 hover:border-orange-300 hover:bg-orange-50"
+									? "bg-orange-50 border-orange-300 text-orange-700"
+									: "bg-white border-gray-300 hover:border-orange-400 hover:bg-orange-50"
 							)}
 						>
 							<option value="">{filter.type.charAt(0).toUpperCase() + filter.type.slice(1)}</option>
@@ -140,15 +118,12 @@
 								<option value={option.value}>{option.label}</option>
 							{/each}
 						</select>
-						<span class="absolute left-2 top-1/2 -translate-y-1/2 text-sm pointer-events-none">
-							{filter.icon}
-						</span>
 						{#if selectedFilters[filter.type]}
 							<button
 								onclick={() => applyFilter(filter.type, '')}
-								class="absolute right-1.5 top-1/2 -translate-y-1/2"
+								class="absolute right-2 top-1/2 -translate-y-1/2 hover:bg-orange-200 rounded-full p-0.5"
 							>
-								<X class="h-2.5 w-2.5 text-orange-600" />
+								<X class="h-3 w-3 text-orange-600" />
 							</button>
 						{/if}
 					</div>
@@ -158,7 +133,7 @@
 				<select
 					value={selectedFilters.sort}
 					onchange={(e) => { selectedFilters.sort = e.currentTarget.value; updateUrl(); }}
-					class="appearance-none pl-6 pr-3 py-1.5 rounded-full text-xs font-medium border bg-white border-gray-200 hover:border-orange-300 hover:bg-orange-50 whitespace-nowrap"
+					class="filter-select appearance-none pl-3 pr-7 py-2 rounded-lg text-xs font-medium border bg-white border-gray-300 hover:border-orange-400 hover:bg-orange-50 min-w-[90px] outline-none"
 				>
 					{#each sortOptions as option}
 						<option value={option.value}>{option.label}</option>
@@ -175,13 +150,12 @@
 						<button
 							onclick={() => showAllFilters = !showAllFilters}
 							class={cn(
-								"flex items-center gap-2 px-4 py-2 rounded-lg border font-medium transition-all duration-200",
+								"flex items-center gap-1.5 px-3 py-2 rounded-lg border font-medium transition-all duration-200",
 								selectedFilters[filter.type]
 									? "bg-orange-100 border-orange-300 text-orange-700 hover:bg-orange-200"
 									: "bg-white border-gray-200 hover:border-orange-300 hover:bg-orange-50"
 							)}
 						>
-							<span>{filter.icon}</span>
 							<span>{filter.type.charAt(0).toUpperCase() + filter.type.slice(1)}</span>
 							{#if selectedFilters[filter.type]}
 								<span class="text-sm">: {filter.options.find(o => o.value === selectedFilters[filter.type])?.label}</span>
@@ -240,8 +214,7 @@
 			<div class="space-y-4">
 				{#each quickFilters as filter}
 					<div>
-						<h3 class="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-1">
-							<span>{filter.icon}</span>
+						<h3 class="text-sm font-semibold text-gray-700 mb-2">
 							{filter.type.charAt(0).toUpperCase() + filter.type.slice(1)}
 						</h3>
 						<div class="flex flex-wrap gap-2">
@@ -275,11 +248,17 @@
 		display: none;
 	}
 	
-	/* Custom select arrow */
-	select {
-		background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M10.293 3.293L6 7.586 1.707 3.293A1 1 0 00.293 4.707l5 5a1 1 0 001.414 0l5-5a1 1 0 10-1.414-1.414z'/%3E%3C/svg%3E");
+	/* Custom select arrow for filter selects */
+	.filter-select {
+		background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23f97316' d='M10.293 3.293L6 7.586 1.707 3.293A1 1 0 00.293 4.707l5 5a1 1 0 001.414 0l5-5a1 1 0 10-1.414-1.414z'/%3E%3C/svg%3E");
 		background-repeat: no-repeat;
-		background-position: right 0.5rem center;
-		background-size: 1rem;
+		background-position: right 0.75rem center;
+		background-size: 0.75rem;
+	}
+	
+	.filter-select:focus {
+		outline: none !important;
+		box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.2) !important;
+		border-color: #f97316 !important;
 	}
 </style>

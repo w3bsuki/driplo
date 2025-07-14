@@ -2,112 +2,99 @@
 	import { cn } from '$lib/utils';
 	import { goto } from '$app/navigation';
 	import { ChevronRight } from 'lucide-svelte';
+	import type { Category } from '$lib/types';
+
+	interface Props {
+		categories?: any[];
+	}
+	
+	let { categories = [] }: Props = $props();
 
 	let selectedCategory = $state('');
 	let hoveredCategory = $state('');
 
-	const mainCategories = [
+	// Category images mapping
+	const categoryImages: Record<string, { image: string; color: string }> = {
+		women: {
+			image: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=400&h=400&fit=crop',
+			color: 'from-pink-400 to-purple-400'
+		},
+		men: {
+			image: 'https://images.unsplash.com/photo-1516257984-b1b4d707412e?w=400&h=400&fit=crop',
+			color: 'from-blue-400 to-indigo-400'
+		},
+		kids: {
+			image: 'https://images.unsplash.com/photo-1503919545889-aef636e10ad4?w=400&h=400&fit=crop',
+			color: 'from-green-400 to-teal-400'
+		},
+		designer: {
+			image: 'https://images.unsplash.com/photo-1609709295948-17d77cb2a69b?w=400&h=400&fit=crop',
+			color: 'from-yellow-400 to-orange-400'
+		},
+		shoes: {
+			image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=400&fit=crop',
+			color: 'from-red-400 to-pink-400'
+		},
+		bags: {
+			image: 'https://images.unsplash.com/photo-1590874103328-eac38a683ce7?w=400&h=400&fit=crop',
+			color: 'from-purple-400 to-pink-400'
+		}
+	};
+
+	const mainCategories = $derived([
 		{
 			name: 'All',
 			value: '',
+			slug: '',
 			image: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&h=400&fit=crop',
-			count: '5.2M items',
+			count: 'Browse all',
 			color: 'from-orange-400 to-pink-400'
 		},
-		{
-			name: 'Women',
-			value: 'women',
-			image: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=400&h=400&fit=crop',
-			count: '2.3M items',
-			color: 'from-pink-400 to-purple-400'
-		},
-		{
-			name: 'Men',
-			value: 'men',
-			image: 'https://images.unsplash.com/photo-1516257984-b1b4d707412e?w=400&h=400&fit=crop',
-			count: '1.8M items',
-			color: 'from-blue-400 to-indigo-400'
-		},
-		{
-			name: 'Kids',
-			value: 'kids',
-			image: 'https://images.unsplash.com/photo-1503919545889-aef636e10ad4?w=400&h=400&fit=crop',
-			count: '982K items',
-			color: 'from-green-400 to-teal-400'
-		},
-		{
-			name: 'Designer',
-			value: 'designer',
-			image: 'https://images.unsplash.com/photo-1609709295948-17d77cb2a69b?w=400&h=400&fit=crop',
-			count: '156K items',
-			color: 'from-yellow-400 to-orange-400'
-		},
-		{
-			name: 'Shoes',
-			value: 'shoes',
-			image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=400&fit=crop',
-			count: '743K items',
-			color: 'from-red-400 to-pink-400'
-		},
-		{
-			name: 'Bags',
-			value: 'bags',
-			image: 'https://images.unsplash.com/photo-1559563458-527698bf5295?w=400&h=400&fit=crop',
-			count: '421K items',
-			color: 'from-purple-400 to-pink-400'
-		}
-	];
+		...categories.map(cat => ({
+			name: cat.name,
+			value: cat.slug,
+			slug: cat.slug,
+			image: categoryImages[cat.slug]?.image || 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&h=400&fit=crop',
+			count: `${cat.product_count?.[0]?.count || 0} items`,
+			color: categoryImages[cat.slug]?.color || 'from-gray-400 to-gray-600'
+		}))
+	]);
 
-	const subcategories = [
-		{ name: 'T-shirts', value: 'tshirts', emoji: '👕' },
-		{ name: 'Shirts', value: 'shirts', emoji: '👔' },
-		{ name: 'Jeans', value: 'jeans', emoji: '👖' },
-		{ name: 'Dresses', value: 'dresses', emoji: '👗' },
-		{ name: 'Trainers', value: 'trainers', emoji: '👟' },
-		{ name: 'Boots', value: 'boots', emoji: '🥾' },
-		{ name: 'Jackets', value: 'jackets', emoji: '🧥' },
-		{ name: 'Hoodies', value: 'hoodies', emoji: '👕' },
-		{ name: 'Handbags', value: 'handbags', emoji: '👜' },
-		{ name: 'Watches', value: 'watches', emoji: '⌚' },
-		{ name: 'View All', value: 'all', emoji: '→' }
-	];
+	// Removed subcategories - now handled by CategoryDropdown in HeroSearch
 
-	function selectCategory(category: string) {
-		selectedCategory = category;
-		const params = new URLSearchParams();
-		if (category) {
-			params.set('category', category);
+	function selectCategory(categorySlug: string) {
+		selectedCategory = categorySlug;
+		if (categorySlug) {
+			// Navigate to dedicated category page
+			goto(`/${categorySlug}`);
+		} else {
+			// Navigate to browse all
+			goto('/browse');
 		}
-		goto(`/browse${params.toString() ? '?' + params.toString() : ''}`);
 	}
+
+	// Removed selectSubcategory function - subcategories now handled by CategoryDropdown
 </script>
 
-<section class="py-3 md:py-4 bg-white">
+<section class="pt-3 md:pt-4 pb-1 md:pb-2 bg-gradient-to-b from-orange-50 to-white">
 	<div class="container px-4">
 		<!-- Main Categories with Circle Images -->
-		<div class="mb-4">
-			<div class="flex items-start gap-4 md:gap-6 overflow-x-auto pb-2 scrollbar-hide snap-x snap-mandatory">
+		<div class="mb-1">
+			<div class="flex items-start gap-3 md:gap-5 overflow-x-auto pb-3 scrollbar-hide snap-x snap-mandatory justify-start md:justify-center">
 				{#each mainCategories as category}
 					<button
 						onclick={() => selectCategory(category.value)}
 						onmouseenter={() => hoveredCategory = category.value}
 						onmouseleave={() => hoveredCategory = ''}
-						class="group flex-shrink-0 text-center transition-all duration-300 snap-center"
+						class="group flex-shrink-0 text-center transition-all duration-300 snap-center rounded-lg p-2"
+						style="outline: none !important; -webkit-tap-highlight-color: transparent !important; box-shadow: none !important;"
 					>
 						<!-- Category Image Container -->
-						<div class="relative mb-1.5 md:mb-2">
-							<!-- Gradient Border on Hover -->
-							<div class={cn(
-								"absolute inset-0 rounded-full bg-gradient-to-r transition-all duration-300",
-								category.color,
-								hoveredCategory === category.value || selectedCategory === category.value
-									? "opacity-100 blur-sm scale-110" 
-									: "opacity-0"
-							)}></div>
+						<div class="relative mb-2 md:mb-3">
 							
 							<!-- Image Circle -->
 							<div class={cn(
-								"relative w-14 h-14 md:w-20 md:h-20 mx-auto overflow-hidden rounded-full transition-all duration-300 border-2",
+								"relative w-16 h-16 md:w-24 md:h-24 mx-auto overflow-hidden rounded-full transition-all duration-300 border-2",
 								selectedCategory === category.value 
 									? "border-orange-500 shadow-lg scale-105" 
 									: hoveredCategory === category.value
@@ -133,9 +120,9 @@
 						</div>
 						
 						<!-- Category Info -->
-						<div class="min-w-[56px] md:min-w-[80px]">
+						<div class="min-w-[64px] md:min-w-[96px]">
 							<h3 class={cn(
-								"text-xs md:text-sm font-medium transition-colors duration-200",
+								"text-sm md:text-base font-medium transition-colors duration-200 mb-1",
 								selectedCategory === category.value 
 									? "text-orange-600" 
 									: hoveredCategory === category.value
@@ -143,7 +130,7 @@
 										: "text-gray-900"
 							)}>{category.name}</h3>
 							<p class={cn(
-								"text-[10px] md:text-xs transition-colors duration-200",
+								"text-xs md:text-sm transition-colors duration-200",
 								hoveredCategory === category.value ? "text-gray-600" : "text-gray-400"
 							)}>{category.count}</p>
 						</div>
@@ -152,28 +139,7 @@
 			</div>
 		</div>
 
-		<!-- Subcategories Pills -->
-		<div>
-			<div class="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-hide snap-x">
-				{#each subcategories as subcategory}
-					<button
-						onclick={() => selectCategory(subcategory.value)}
-						class={cn(
-							"group whitespace-nowrap rounded-full px-3 py-1.5 text-xs md:text-sm font-medium transition-all duration-200 flex-shrink-0 min-h-[32px] md:min-h-[36px] flex items-center gap-1.5 snap-start",
-							subcategory.value === 'all'
-								? "bg-gradient-to-r from-orange-500 to-orange-600 text-white hover:from-orange-600 hover:to-orange-700 shadow-sm hover:shadow-md"
-								: "bg-gray-50 border border-gray-200 hover:border-orange-300 hover:bg-orange-50 text-gray-700 hover:text-orange-600"
-						)}
-					>
-						<span class={cn(
-							"text-sm md:text-base transition-transform duration-200 group-hover:scale-110",
-							subcategory.value === 'all' && "rotate-0"
-						)}>{subcategory.emoji}</span>
-						<span>{subcategory.name}</span>
-					</button>
-				{/each}
-			</div>
-		</div>
+		<!-- Removed subcategory pills - now handled by CategoryDropdown in HeroSearch -->
 	</div>
 </section>
 
@@ -185,5 +151,38 @@
 	}
 	.scrollbar-hide::-webkit-scrollbar {
 		display: none;
+	}
+	
+	/* Remove all browser-specific focus/tap highlights */
+	button {
+		outline: none !important;
+		-webkit-tap-highlight-color: transparent !important;
+		-webkit-focus-ring-color: transparent !important;
+		-moz-outline: none !important;
+		-moz-user-select: none;
+		-webkit-user-select: none;
+		user-select: none;
+		box-shadow: none !important;
+	}
+	
+	button:focus {
+		outline: none !important;
+		box-shadow: none !important;
+		border: none !important;
+	}
+	
+	button:active {
+		outline: none !important;
+		box-shadow: none !important;
+	}
+	
+	button:focus-visible {
+		outline: none !important;
+		box-shadow: none !important;
+	}
+	
+	button::-moz-focus-inner {
+		border: 0 !important;
+		outline: none !important;
 	}
 </style>

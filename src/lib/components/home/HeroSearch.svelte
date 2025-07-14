@@ -1,10 +1,19 @@
 <script lang="ts">
-	import { Search, Sparkles, TrendingUp } from 'lucide-svelte';
+	import { Search, Sparkles, TrendingUp, ChevronDown } from 'lucide-svelte';
 	import { goto } from '$app/navigation';
 	import { cn } from '$lib/utils';
+	import CategoryDropdown from '$lib/components/shared/CategoryDropdown.svelte';
+	import type { Category } from '$lib/types';
+	
+	interface Props {
+		categories?: Category[];
+	}
+	
+	let { categories = [] }: Props = $props();
 	
 	let searchQuery = $state('');
 	let isFocused = $state(false);
+	let isCategoryDropdownOpen = $state(false);
 	
 	const trendingSearches = [
 		'vintage levis',
@@ -14,11 +23,18 @@
 		'north face jacket'
 	];
 	
-	const categoryQuickLinks = [
-		{ icon: '👗', name: 'Dresses', value: 'dresses' },
-		{ icon: '👟', name: 'Trainers', value: 'trainers' },
-		{ icon: '👜', name: 'Bags', value: 'bags' },
-		{ icon: '🧥', name: 'Jackets', value: 'jackets' }
+	// Top trending categories - these would be dynamic based on analytics
+	const trendingCategories = [
+		{ icon: '👗', name: 'Dresses', value: 'dresses', trending: true },
+		{ icon: '👟', name: 'Trainers', value: 'trainers', trending: true },
+		{ icon: '👜', name: 'Bags', value: 'bags', trending: true },
+		{ icon: '🧥', name: 'Jackets', value: 'jackets', trending: true },
+		{ icon: '👠', name: 'Shoes', value: 'shoes', trending: true },
+		{ icon: '👕', name: 'T-Shirts', value: 'tshirts', trending: true },
+		{ icon: '👖', name: 'Jeans', value: 'jeans', trending: true },
+		{ icon: '⌚', name: 'Watches', value: 'watches', trending: true },
+		{ icon: '💍', name: 'Jewelry', value: 'jewelry', trending: true },
+		{ icon: '🕶️', name: 'Sunglasses', value: 'sunglasses', trending: true }
 	];
 	
 	function handleSearch() {
@@ -39,9 +55,17 @@
 	function goToCategory(category: string) {
 		goto(`/browse?category=${category}`);
 	}
+	
+	function toggleCategoryDropdown() {
+		isCategoryDropdownOpen = !isCategoryDropdownOpen;
+	}
+	
+	function closeCategoryDropdown() {
+		isCategoryDropdownOpen = false;
+	}
 </script>
 
-<section class="relative bg-gradient-to-b from-orange-50 to-white py-3 md:py-4">
+<section class="relative bg-gradient-to-b from-orange-50 to-white py-3 md:py-4 pb-0">
 	<div class="container px-4">
 		<div class="max-w-3xl mx-auto">
 			
@@ -52,14 +76,41 @@
 					isFocused && "opacity-30 blur-2xl"
 				)}></div>
 				
-				<div class="relative bg-white rounded-2xl shadow-lg border border-gray-100 transition-all duration-300 hover:shadow-xl">
+				<div class="relative bg-white rounded-2xl shadow-lg border border-orange-200 transition-all duration-300 hover:shadow-xl hover:border-orange-300">
 					<div class="flex items-center">
-						<div class="pl-6 pr-3">
-							<Search class={cn(
-								"h-5 w-5 transition-colors duration-200",
-								isFocused ? "text-orange-500" : "text-gray-400"
-							)} />
+						<!-- Category Dropdown Button -->
+						<div class="relative pl-4 pr-3">
+							<button
+								data-categories-button
+								onclick={toggleCategoryDropdown}
+								class={cn(
+									"flex items-center gap-1.5 px-3 py-2 rounded-lg transition-all duration-200 font-medium text-sm",
+									isCategoryDropdownOpen 
+										? "bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-sm hover:from-orange-600 hover:to-orange-700" 
+										: "bg-gradient-to-r from-orange-100 to-orange-200 hover:from-orange-200 hover:to-orange-300 border border-orange-300"
+								)}
+							>
+								<span class={cn(
+									isCategoryDropdownOpen ? "text-white" : "text-gray-900"
+								)}>Categories</span>
+								<ChevronDown class={cn(
+									"h-4 w-4 transition-transform duration-200",
+									isCategoryDropdownOpen && "rotate-180",
+									isCategoryDropdownOpen ? "text-white" : "text-gray-900"
+								)} />
+							</button>
+							
+							<CategoryDropdown
+								{categories}
+								isOpen={isCategoryDropdownOpen}
+								onToggle={toggleCategoryDropdown}
+								onClose={closeCategoryDropdown}
+							/>
 						</div>
+						
+						<!-- Divider -->
+						<div class="w-px h-6 bg-orange-200"></div>
+						
 						
 						<input
 							type="search"
@@ -68,29 +119,32 @@
 							onfocus={() => isFocused = true}
 							onblur={() => isFocused = false}
 							onkeydown={(e) => e.key === 'Enter' && handleSearch()}
-							class="flex-1 py-3 md:py-3.5 pr-4 text-sm md:text-base placeholder:text-gray-400 focus:outline-none bg-transparent"
+							class="flex-1 py-4 md:py-4.5 pl-4 pr-4 text-sm md:text-base placeholder:text-gray-400 focus:outline-none bg-transparent focus:placeholder:text-orange-400"
 						/>
 						
 						<button
 							onclick={handleSearch}
-							class="mr-2 px-4 md:px-5 py-2 bg-gradient-to-r from-orange-500 to-orange-600 text-white font-medium rounded-lg text-sm md:text-base hover:from-orange-600 hover:to-orange-700 transition-all duration-200 active:scale-95"
+							class="mr-3 p-2.5 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-all duration-200 active:scale-95 flex items-center justify-center"
+							aria-label="Search"
 						>
-							Search
+							<Search class="h-4 w-4" />
 						</button>
 					</div>
 					
-					<!-- Quick Category Links -->
-					<div class="border-t border-gray-100 px-4 py-2 flex items-center gap-3 overflow-x-auto">
-						<span class="text-xs text-gray-500 flex-shrink-0 hidden md:block">Quick:</span>
-						{#each categoryQuickLinks as category}
-							<button
-								onclick={() => goToCategory(category.value)}
-								class="flex items-center gap-1 px-2.5 py-1 rounded-full bg-gray-50 hover:bg-orange-50 hover:text-orange-600 transition-all duration-200 text-xs font-medium whitespace-nowrap group"
-							>
-								<span class="text-sm group-hover:scale-110 transition-transform duration-200">{category.icon}</span>
-								<span>{category.name}</span>
-							</button>
-						{/each}
+					<!-- Trending Category Links -->
+					<div class="border-t border-orange-100 py-2 flex items-center gap-3 overflow-x-auto">
+						<div class="flex items-center gap-3 px-4">
+							<span class="text-xs text-gray-500 flex-shrink-0 hidden md:block">Trending:</span>
+							{#each trendingCategories as category}
+								<button
+									onclick={() => goToCategory(category.value)}
+									class="flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/80 backdrop-blur-sm shadow-sm text-gray-800 hover:bg-white hover:shadow-md transition-all duration-200 text-xs font-medium whitespace-nowrap group"
+								>
+									<span class="text-sm">{category.icon}</span>
+									<span>{category.name}</span>
+								</button>
+							{/each}
+						</div>
 					</div>
 				</div>
 			</div>

@@ -9,7 +9,9 @@
       "Bash(npm run dev:*)",
       "Bash(curl:*)",
       "Bash(git checkout:*)",
-      "WebFetch(domain:supabase.com)"
+      "WebFetch(domain:supabase.com)",
+      "WebFetch(domain:www.vinted.co.uk)",
+      "Bash(npm run build:*)"
     ],
     "deny": []
   }
