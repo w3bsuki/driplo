@@ -2,11 +2,11 @@
 	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
-	import { formatCurrency } from '$lib/utils/format';
+	import { formatCurrency } from '$lib/utils/currency.js';
 	import { ChevronLeft, ChevronRight, X, Heart, MessageCircle, Share2, MapPin, Shield, Eye, MoreVertical } from 'lucide-svelte';
-	import { clickOutside } from '$lib/utils/clickOutside';
+	import { clickOutside } from '$lib/actions';
 	import type { PageData } from './$types';
-	import { cn } from '$lib/utils/cn';
+	import { cn } from '$lib/utils';
 
 	export let data: PageData;
 

@@ -5,6 +5,8 @@
 	import { cn } from '$lib/utils';
 	import { user, profile, auth } from '$lib/stores/auth';
 	import type { Category } from '$lib/types';
+	import * as m from '$lib/paraglide/messages.js';
+	import LanguageSwitcher from './LanguageSwitcher.svelte';
 	
 	interface Props {
 		categories?: Category[];
@@ -88,7 +90,7 @@
 				<Search class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
 				<input
 					type="search"
-					placeholder="Search for items, brands, or users..."
+					placeholder={m.header_search_placeholder()}
 					bind:value={searchQuery}
 					onkeydown={(e) => e.key === 'Enter' && handleSearch()}
 					class="w-full rounded-xl border border-input bg-background pl-10 pr-4 py-2.5 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 transition-all hover:border-orange-200"
@@ -98,13 +100,14 @@
 
 		<!-- Desktop Actions -->
 		<div class="hidden md:flex items-center space-x-2">
+			<LanguageSwitcher />
 			<button class="relative p-2 hover:bg-muted rounded-lg transition-colors">
 				<Heart class="h-5 w-5 text-muted-foreground hover:text-foreground" />
-				<span class="sr-only">Favorites</span>
+				<span class="sr-only">{m.header_favorites()}</span>
 			</button>
 			<a href="/messages" class="relative p-2 hover:bg-muted rounded-lg transition-colors">
 				<MessageCircle class="h-5 w-5 text-muted-foreground hover:text-foreground" />
-				<span class="sr-only">Messages</span>
+				<span class="sr-only">{m.header_messages()}</span>
 			</a>
 			<a href={$user ? ($profile?.username ? `/profile/${$profile.username}` : '/profile') : '/login'} class="relative hover:bg-orange-50 rounded-full transition-colors group">
 				{#if $user}
@@ -120,7 +123,7 @@
 						<User class="h-5 w-5 text-orange-600" />
 					</div>
 				{/if}
-				<span class="sr-only">{$user ? 'Profile' : 'Sign in'}</span>
+				<span class="sr-only">{$user ? m.header_my_profile() : m.header_sign_in()}</span>
 			</a>
 		</div>
 
@@ -128,7 +131,7 @@
 		<div class="flex md:hidden items-center gap-2 ml-auto">
 			<a href="/cart" class="relative p-2 hover:bg-orange-50 rounded-lg transition-colors">
 				<span class="text-lg">🛒</span>
-				<span class="sr-only">Cart</span>
+				<span class="sr-only">{m.header_my_cart()}</span>
 			</a>
 			<a href={$user ? ($profile?.username ? `/profile/${$profile.username}` : '/profile') : '/login'} class="relative hover:bg-orange-50 rounded-full transition-colors group">
 				{#if $user}
@@ -144,7 +147,7 @@
 						<User class="h-5 w-5 text-orange-600" />
 					</div>
 				{/if}
-				<span class="sr-only">{$user ? 'Profile' : 'Sign in'}</span>
+				<span class="sr-only">{$user ? m.header_my_profile() : m.header_sign_in()}</span>
 			</a>
 		</div>
 	</div>
@@ -187,7 +190,7 @@
 			<div class="flex h-full flex-col">
 				<!-- Header -->
 				<div class="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-					<h2 class="text-lg font-semibold text-gray-900">Menu</h2>
+					<h2 class="text-lg font-semibold text-gray-900">{m.header_menu()}</h2>
 					<button 
 						onclick={closeMenu}
 						class="h-8 w-8 flex items-center justify-center rounded-lg hover:bg-orange-50 transition-colors"
@@ -206,7 +209,7 @@
 							class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100"
 						>
 							<Home class="h-4 w-4" />
-							Home
+							{m.header_home()}
 						</a>
 						<a 
 							href="/browse" 
@@ -214,7 +217,7 @@
 							class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100"
 						>
 							<Search class="h-4 w-4" />
-							Browse
+							{m.header_browse()}
 						</a>
 						<a 
 							href="/sell" 
@@ -222,7 +225,7 @@
 							class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100"
 						>
 							<Camera class="h-4 w-4" />
-							Sell Item
+							{m.header_sell_item()}
 						</a>
 						<a 
 							href="/messages" 
@@ -230,7 +233,7 @@
 							class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100"
 						>
 							<MessageCircle class="h-4 w-4" />
-							Messages
+							{m.header_messages()}
 						</a>
 						<a 
 							href={$user ? ($profile?.username ? `/profile/${$profile.username}` : '/profile') : '/login'} 
@@ -244,7 +247,7 @@
 							{:else}
 								<User class="h-4 w-4 text-orange-600" />
 							{/if}
-							{$user ? 'Profile' : 'Sign in'}
+							{$user ? m.header_my_profile() : m.header_sign_in()}
 						</a>
 						<a 
 							href="/favorites" 
@@ -252,14 +255,14 @@
 							class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100"
 						>
 							<Heart class="h-4 w-4" />
-							Favorites
+							{m.header_favorites()}
 						</a>
 					</div>
 					
 					<!-- Categories Section -->
 					{#if categories.length > 0}
 						<div class="mt-6 pt-6 border-t border-gray-200">
-							<h3 class="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Categories</h3>
+							<h3 class="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">{m.header_categories()}</h3>
 							<div class="space-y-1">
 								{#each categories as category}
 									<a 
@@ -283,9 +286,17 @@
 								class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-orange-600 transition-colors hover:bg-orange-50 hover:text-orange-700"
 							>
 								<User class="h-4 w-4 text-orange-600" />
-								Settings
+								{m.header_settings()}
 							</a>
 						{/if}
+					</div>
+					
+					<!-- Language Switcher -->
+					<div class="mt-6 pt-6 border-t border-gray-200 px-3">
+						<div class="flex items-center justify-between">
+							<span class="text-sm text-gray-600">Language</span>
+							<LanguageSwitcher />
+						</div>
 					</div>
 				</nav>
 
@@ -296,7 +307,7 @@
 						class="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white py-3 px-4 rounded-xl font-medium shadow-md hover:shadow-lg transition-all duration-200 flex items-center justify-center gap-2"
 					>
 						<Camera class="h-4 w-4" />
-						Sell an Item
+						{m.header_sell_item()}
 					</button>
 				</div>
 			</div>

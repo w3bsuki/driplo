@@ -15,7 +15,8 @@
       "Bash(git push:*)",
       "WebFetch(domain:inlang.com)",
       "WebFetch(domain:leovoon.github.io)",
-      "WebFetch(domain:www.npmjs.com)"
+      "WebFetch(domain:www.npmjs.com)",
+      "Bash(git commit:*)"
     ],
     "deny": []
   }

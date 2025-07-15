@@ -13,6 +13,7 @@
 	} from 'lucide-svelte'
 	import { uploadMultipleImages, fileToBase64, validateImageFile } from '$lib/utils/storage'
 	import type { Database } from '$lib/types/database'
+	import * as m from '$lib/paraglide/messages.js'
 	
 	type ListingInsert = Database['public']['Tables']['listings']['Insert']
 	type Category = Database['public']['Tables']['categories']['Row']
@@ -110,7 +111,7 @@
 		
 		if (error) {
 			console.error('Error loading categories:', error)
-			toast.error('Failed to load categories. We will add default categories for now.')
+			toast.error(m.listing_error_categories())
 			// Add default categories with proper UUIDs
 			categories = [
 				{ id: '550e8400-e29b-41d4-a716-446655440001', name: 'Women', icon: '👗', slug: 'women', is_active: true },
@@ -141,7 +142,7 @@
 		}
 		
 		if (validFiles.length + formData.images.length > 10) {
-			toast.error('Maximum 10 images allowed')
+			toast.error(m.listing_error_image_max())
 			return
 		}
 		
@@ -186,7 +187,7 @@
 	
 	async function handleSubmit() {
 		if (!$user) {
-			toast.error('Please login to create a listing')
+			toast.error(m.listing_error_login())
 			return
 		}
 		
@@ -282,7 +283,7 @@
 			
 			if (error) throw error
 			
-			toast.success('Listing created successfully!')
+			toast.success(m.listing_success())
 			
 			// Track activity - commented out until user_activities table exists
 			// await supabase.from('user_activities').insert({
@@ -305,7 +306,7 @@
 			
 		} catch (error) {
 			console.error('Error creating listing:', error)
-			toast.error(error instanceof Error ? error.message : 'Failed to create listing')
+			toast.error(error instanceof Error ? error.message : m.listing_error_creation())
 		} finally {
 			isSubmitting = false
 			uploadProgress = 0
@@ -341,10 +342,10 @@
 	// Get step title
 	const stepTitle = $derived(() => {
 		switch (currentStep) {
-			case 1: return 'Basic Information'
-			case 2: return 'Add Photos'
-			case 3: return 'Pricing & Details'
-			case 4: return 'Shipping & Location'
+			case 1: return m.listing_step_basic_info()
+			case 2: return m.listing_step_add_photos()
+			case 3: return m.listing_step_pricing_details()
+			case 4: return m.listing_step_shipping_location()
 			default: return ''
 		}
 	})
@@ -361,14 +362,14 @@
 				>
 					<ChevronLeft class="w-5 h-5" />
 				</button>
-				<h1 class="text-lg font-semibold">Create Listing</h1>
+				<h1 class="text-lg font-semibold">{m.listing_create_title()}</h1>
 				<div class="w-5 h-5" /> <!-- Spacer -->
 			</div>
 			
 			<!-- Progress Bar -->
 			<div class="pb-4">
 				<div class="flex items-center justify-between mb-2">
-					<span class="text-sm text-gray-600">Step {currentStep} of {totalSteps}</span>
+					<span class="text-sm text-gray-600">{m.listing_step_of({ step: currentStep, total: totalSteps })}</span>
 					<span class="text-sm font-medium">{stepTitle()}</span>
 				</div>
 				<div class="w-full bg-gray-200 rounded-full h-2">
@@ -389,39 +390,39 @@
 				<div class="space-y-6 animate-in">
 					<div>
 						<label for="title" class="block text-sm font-medium text-gray-700 mb-2">
-							Title <span class="text-red-500">*</span>
+							{m.listing_title_label()} <span class="text-red-500">{m.listing_required_field()}</span>
 						</label>
 						<input
 							id="title"
 							type="text"
 							bind:value={formData.title}
-							placeholder="What are you selling?"
+							placeholder={m.listing_title_placeholder()}
 							maxlength="80"
 							class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
 							required
 						/>
-						<p class="mt-1 text-xs text-gray-500">{formData.title.length}/80 characters</p>
+						<p class="mt-1 text-xs text-gray-500">{m.listing_title_characters({ count: formData.title.length })}</p>
 					</div>
 					
 					<div>
 						<label for="description" class="block text-sm font-medium text-gray-700 mb-2">
-							Description <span class="text-red-500">*</span>
+							{m.listing_description_label()} <span class="text-red-500">{m.listing_required_field()}</span>
 						</label>
 						<textarea
 							id="description"
 							bind:value={formData.description}
-							placeholder="Describe your item in detail..."
+							placeholder={m.listing_description_placeholder()}
 							rows={6}
 							maxlength={1000}
 							class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-none"
 							required
 						></textarea>
-						<p class="mt-1 text-xs text-gray-500">{formData.description.length}/1000 characters</p>
+						<p class="mt-1 text-xs text-gray-500">{m.listing_description_characters({ count: formData.description.length })}</p>
 					</div>
 					
 					<div>
 						<label for="category" class="block text-sm font-medium text-gray-700 mb-2">
-							Category <span class="text-red-500">*</span>
+							{m.listing_category_label()} <span class="text-red-500">{m.listing_required_field()}</span>
 						</label>
 						<select
 							id="category"
@@ -429,7 +430,7 @@
 							class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
 							required
 						>
-							<option value="">Select a category</option>
+							<option value="">{m.listing_category_placeholder()}</option>
 							{#each categories as category}
 								<option value={category.id}>
 									{category.icon} {category.name}
@@ -441,13 +442,13 @@
 					{#if formData.category_id}
 						<div>
 							<label for="subcategory" class="block text-sm font-medium text-gray-700 mb-2">
-								Subcategory
+								{m.listing_subcategory_label()}
 							</label>
 							<input
 								id="subcategory"
 								type="text"
 								bind:value={formData.subcategory}
-								placeholder="e.g., Dresses, Sneakers, Jackets"
+								placeholder={m.listing_subcategory_placeholder()}
 								class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
 							/>
 						</div>
@@ -459,9 +460,9 @@
 			{#if currentStep === 2}
 				<div class="space-y-6 animate-in">
 					<div>
-						<h3 class="text-lg font-semibold mb-2">Add Photos</h3>
+						<h3 class="text-lg font-semibold mb-2">{m.listing_add_photos_title()}</h3>
 						<p class="text-sm text-gray-600 mb-4">
-							Add up to 10 photos. The first photo will be your cover image.
+							{m.listing_add_photos_description()}
 						</p>
 						
 						<!-- Image Upload Area -->
@@ -480,8 +481,8 @@
 								/>
 								<div class="flex flex-col items-center justify-center h-full text-gray-400">
 									<Upload class="w-12 h-12 mb-3" />
-									<p class="text-sm font-medium">Click to upload images</p>
-									<p class="text-xs mt-1">JPEG, PNG, WebP, GIF (max 10MB)</p>
+									<p class="text-sm font-medium">{m.listing_upload_instructions()}</p>
+									<p class="text-xs mt-1">{m.listing_upload_formats()}</p>
 								</div>
 							</label>
 						{:else}
@@ -496,7 +497,7 @@
 										/>
 										{#if index === 0}
 											<div class="absolute top-2 left-2 bg-orange-500 text-white text-xs px-2 py-1 rounded-full">
-												Cover
+												{m.listing_cover_image()}
 											</div>
 										{/if}
 										<div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-xl flex items-center justify-center gap-2">
@@ -544,14 +545,14 @@
 										/>
 										<div class="text-center">
 											<Plus class="w-8 h-8 text-gray-400 mx-auto mb-1" />
-											<p class="text-xs text-gray-500">Add more</p>
+											<p class="text-xs text-gray-500">{m.listing_add_more()}</p>
 										</div>
 									</label>
 								{/if}
 							</div>
 							
 							<p class="text-sm text-gray-600">
-								{formData.images.length}/10 images uploaded
+								{m.listing_images_count({ count: formData.images.length })}
 							</p>
 						{/if}
 					</div>
@@ -563,7 +564,7 @@
 				<div class="space-y-6 animate-in">
 					<div>
 						<label for="price" class="block text-sm font-medium text-gray-700 mb-2">
-							Price <span class="text-red-500">*</span>
+							{m.listing_price_label()} <span class="text-red-500">{m.listing_required_field()}</span>
 						</label>
 						<div class="relative">
 							<span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">$</span>
@@ -573,7 +574,7 @@
 								bind:value={formData.price}
 								min="0"
 								step="0.01"
-								placeholder="0.00"
+								placeholder={m.listing_price_placeholder()}
 								class="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
 								required
 							/>
@@ -582,7 +583,7 @@
 					
 					<div>
 						<label for="condition" class="block text-sm font-medium text-gray-700 mb-2">
-							Condition <span class="text-red-500">*</span>
+							{m.listing_condition_label()} <span class="text-red-500">{m.listing_required_field()}</span>
 						</label>
 						<select
 							id="condition"
@@ -590,37 +591,37 @@
 							class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
 							required
 						>
-							<option value="new">New with tags</option>
-							<option value="like_new">Like new</option>
-							<option value="good">Good</option>
-							<option value="fair">Fair</option>
-							<option value="poor">Poor</option>
+							<option value="new">{m.listing_condition_new()}</option>
+							<option value="like_new">{m.listing_condition_like_new()}</option>
+							<option value="good">{m.listing_condition_good()}</option>
+							<option value="fair">{m.listing_condition_fair()}</option>
+							<option value="poor">{m.listing_condition_poor()}</option>
 						</select>
 					</div>
 					
 					<div class="grid grid-cols-2 gap-4">
 						<div>
 							<label for="brand" class="block text-sm font-medium text-gray-700 mb-2">
-								Brand
+								{m.listing_brand_label()}
 							</label>
 							<input
 								id="brand"
 								type="text"
 								bind:value={formData.brand}
-								placeholder="e.g., Nike, Zara"
+								placeholder={m.listing_brand_placeholder()}
 								class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
 							/>
 						</div>
 						
 						<div>
 							<label for="size" class="block text-sm font-medium text-gray-700 mb-2">
-								Size
+								{m.listing_size_label()}
 							</label>
 							<input
 								id="size"
 								type="text"
 								bind:value={formData.size}
-								placeholder="e.g., M, 38, One Size"
+								placeholder={m.listing_size_placeholder()}
 								class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
 							/>
 						</div>
@@ -628,13 +629,13 @@
 					
 					<div>
 						<label for="color" class="block text-sm font-medium text-gray-700 mb-2">
-							Color
+							{m.listing_color_label()}
 						</label>
 						<input
 							id="color"
 							type="text"
 							bind:value={formData.color}
-							placeholder="e.g., Black, Multi-color"
+							placeholder={m.listing_color_placeholder()}
 							class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
 						/>
 					</div>
@@ -646,7 +647,7 @@
 				<div class="space-y-6 animate-in">
 					<div>
 						<label for="location" class="block text-sm font-medium text-gray-700 mb-2">
-							Location <span class="text-red-500">*</span>
+							{m.listing_location_label()} <span class="text-red-500">{m.listing_required_field()}</span>
 						</label>
 						<div class="relative">
 							<MapPin class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -654,7 +655,7 @@
 								id="location"
 								type="text"
 								bind:value={formData.location}
-								placeholder="City, State"
+								placeholder={m.listing_location_placeholder()}
 								class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
 								required
 							/>
@@ -663,7 +664,7 @@
 					
 					<div>
 						<label class="block text-sm font-medium text-gray-700 mb-2">
-							Shipping Options <span class="text-red-500">*</span>
+							{m.listing_shipping_options()} <span class="text-red-500">{m.listing_required_field()}</span>
 						</label>
 						<div class="space-y-3">
 							<label class="flex items-start gap-3 p-4 border border-gray-200 rounded-xl cursor-pointer hover:border-orange-500 {formData.shipping_type === 'standard' ? 'border-orange-500 bg-orange-50' : ''}">
@@ -674,8 +675,8 @@
 									class="mt-1"
 								/>
 								<div class="flex-1">
-									<div class="font-medium">Standard Shipping</div>
-									<div class="text-sm text-gray-600">3-5 business days</div>
+									<div class="font-medium">{m.listing_shipping_standard()}</div>
+									<div class="text-sm text-gray-600">{m.listing_shipping_standard_time()}</div>
 								</div>
 							</label>
 							
@@ -687,8 +688,8 @@
 									class="mt-1"
 								/>
 								<div class="flex-1">
-									<div class="font-medium">Express Shipping</div>
-									<div class="text-sm text-gray-600">1-2 business days</div>
+									<div class="font-medium">{m.listing_shipping_express()}</div>
+									<div class="text-sm text-gray-600">{m.listing_shipping_express_time()}</div>
 								</div>
 							</label>
 							
@@ -700,8 +701,8 @@
 									class="mt-1"
 								/>
 								<div class="flex-1">
-									<div class="font-medium">Local Pickup Only</div>
-									<div class="text-sm text-gray-600">No shipping available</div>
+									<div class="font-medium">{m.listing_shipping_pickup()}</div>
+									<div class="text-sm text-gray-600">{m.listing_shipping_pickup_desc()}</div>
 								</div>
 							</label>
 						</div>
@@ -710,7 +711,7 @@
 					{#if formData.shipping_type !== 'pickup_only'}
 						<div>
 							<label for="shipping_cost" class="block text-sm font-medium text-gray-700 mb-2">
-								Shipping Cost
+								{m.listing_shipping_cost_label()}
 							</label>
 							<div class="relative">
 								<span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">$</span>
@@ -720,17 +721,17 @@
 									bind:value={formData.shipping_cost}
 									min="0"
 									step="0.01"
-									placeholder="0.00"
+									placeholder={m.listing_shipping_cost_placeholder()}
 									class="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
 								/>
 							</div>
-							<p class="mt-1 text-xs text-gray-500">Set to 0 for free shipping</p>
+							<p class="mt-1 text-xs text-gray-500">{m.listing_shipping_cost_free()}</p>
 						</div>
 					{/if}
 					
 					<div>
 						<label class="block text-sm font-medium text-gray-700 mb-2">
-							Tags
+							{m.listing_tags_label()}
 						</label>
 						<div class="flex flex-wrap gap-2 mb-3">
 							{#each formData.tags as tag}
@@ -749,7 +750,7 @@
 						
 						{#if suggestedTags().length > 0}
 							<div class="mb-3">
-								<p class="text-xs text-gray-600 mb-2">Suggested tags:</p>
+								<p class="text-xs text-gray-600 mb-2">{m.listing_suggested_tags()}</p>
 								<div class="flex flex-wrap gap-2">
 									{#each suggestedTags() as tag}
 										<button
@@ -766,7 +767,7 @@
 						
 						<input
 							type="text"
-							placeholder="Add a tag and press Enter"
+							placeholder={m.listing_tag_placeholder()}
 							onkeydown={(e) => {
 								if (e.key === 'Enter') {
 									e.preventDefault()
@@ -791,7 +792,7 @@
 						class="flex-1"
 					>
 						<ChevronLeft class="w-4 h-4 mr-1" />
-						Previous
+						{m.listing_btn_previous()}
 					</Button>
 				{/if}
 				
@@ -802,7 +803,7 @@
 						disabled={!canProceed}
 						class="flex-1 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600"
 					>
-						Next
+						{m.listing_btn_next()}
 						<ChevronRight class="w-4 h-4 ml-1" />
 					</Button>
 				{:else}
@@ -813,13 +814,13 @@
 					>
 						{#if isSubmitting}
 							{#if uploadProgress > 0}
-								Uploading... {uploadProgress.toFixed(0)}%
+								{m.listing_uploading_progress({ progress: uploadProgress.toFixed(0) })}
 							{:else}
-								Creating listing...
+								{m.listing_creating()}
 							{/if}
 						{:else}
 							<Sparkles class="w-4 h-4 mr-2" />
-							Publish Listing
+							{m.listing_btn_publish()}
 						{/if}
 					</Button>
 				{/if}

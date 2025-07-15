@@ -231,24 +231,24 @@
 							required
 						/>
 						<label for="terms" class="ml-2 text-sm text-gray-600">
-							I agree to the
-							<a href="/terms" class="text-orange-600 hover:text-orange-500">Terms of Service</a>
-							and
-							<a href="/privacy" class="text-orange-600 hover:text-orange-500">Privacy Policy</a>
+							{m.auth_agree_terms()}
+							<a href="/terms" class="text-orange-600 hover:text-orange-500">{m.auth_terms_service()}</a>
+							{m.auth_and()}
+							<a href="/privacy" class="text-orange-600 hover:text-orange-500">{m.auth_privacy_policy()}</a>
 						</label>
 					</div>
 
 					<Button type="submit" class="w-full" disabled={loading || !agreedToTerms}>
-						{loading ? 'Creating account...' : 'Create account'}
+						{loading ? m.auth_creating_account() : m.auth_create_account()}
 					</Button>
 				</form>
 
 				<!-- Sign in link -->
 				<div class="text-center">
 					<p class="text-sm text-gray-600">
-						Already have an account?
+						{m.auth_have_account()}
 						<a href="/login" class="font-medium text-orange-600 hover:text-orange-500">
-							Sign in
+							{m.auth_sign_in()}
 						</a>
 					</p>
 				</div>

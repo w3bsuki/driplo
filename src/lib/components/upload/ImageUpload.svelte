@@ -2,6 +2,7 @@
 	import { Upload, X, Camera, Loader2 } from 'lucide-svelte'
 	import { Button } from '$lib/components/ui'
 	import { cn } from '$lib/utils'
+	import * as m from '$lib/paraglide/messages.js'
 
 	interface Props {
 		currentImage?: string
@@ -18,7 +19,7 @@
 
 	let {
 		currentImage = '',
-		placeholder = 'Upload image',
+		placeholder = m.upload_placeholder(),
 		aspectRatio = 'square',
 		maxSizeBytes = 5 * 1024 * 1024, // 5MB default
 		allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'],
@@ -63,14 +64,14 @@
 
 		// Validate file type
 		if (!allowedTypes.includes(file.type)) {
-			error = `Only ${allowedTypes.map(t => t.split('/')[1]).join(', ')} files are allowed`
+			error = m.upload_error_type({ types: allowedTypes.map(t => t.split('/')[1]).join(', ') })
 			onerror?.(error)
 			return
 		}
 
 		// Validate file size
 		if (file.size > maxSizeBytes) {
-			error = `File size must be less than ${Math.round(maxSizeBytes / 1024 / 1024)}MB`
+			error = m.upload_error_size({ size: Math.round(maxSizeBytes / 1024 / 1024) })
 			onerror?.(error)
 			return
 		}
@@ -173,7 +174,7 @@
 					<div class="absolute inset-0 bg-black/0 hover:bg-black/10 rounded-lg transition-colors flex items-center justify-center opacity-0 hover:opacity-100">
 						<div class="flex items-center gap-2 text-white">
 							<Camera class="h-5 w-5" />
-							<span class="text-sm font-medium">Change Image</span>
+							<span class="text-sm font-medium">{m.upload_change_image()}</span>
 						</div>
 					</div>
 				{/if}
@@ -183,15 +184,15 @@
 			<div class="flex flex-col items-center justify-center h-full p-6 text-center">
 				{#if uploading}
 					<Loader2 class="h-8 w-8 animate-spin text-muted-foreground mb-2" />
-					<p class="text-sm text-muted-foreground">Uploading...</p>
+					<p class="text-sm text-muted-foreground">{m.upload_uploading()}</p>
 				{:else}
 					<Upload class="h-8 w-8 text-muted-foreground mb-2" />
 					<p class="text-sm font-medium text-foreground mb-1">{placeholder}</p>
 					<p class="text-xs text-muted-foreground">
-						Drag & drop or click to select
+						{m.upload_drag_drop()}
 					</p>
 					<p class="text-xs text-muted-foreground mt-1">
-						{allowedTypes.map(t => t.split('/')[1].toUpperCase()).join(', ')} • Max {Math.round(maxSizeBytes / 1024 / 1024)}MB
+						{m.upload_file_types({ types: allowedTypes.map(t => t.split('/')[1].toUpperCase()).join(', '), size: Math.round(maxSizeBytes / 1024 / 1024) })}
 					</p>
 				{/if}
 			</div>

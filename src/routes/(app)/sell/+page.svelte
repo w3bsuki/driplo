@@ -3,6 +3,7 @@
 	import { user } from '$lib/stores/auth'
 	import CreateListingForm from '$lib/components/listings/CreateListingForm.svelte'
 	import { onMount } from 'svelte'
+	import * as m from '$lib/paraglide/messages.js'
 	
 	onMount(() => {
 		// Check auth on mount only
@@ -17,8 +18,8 @@
 </script>
 
 <svelte:head>
-	<title>Sell on Threadly | Create New Listing</title>
-	<meta name="description" content="List your items for sale on Threadly marketplace" />
+	<title>{m.sell_page_title()}</title>
+	<meta name="description" content={m.sell_page_description()} />
 </svelte:head>
 
 {#if $user}
@@ -26,8 +27,8 @@
 {:else}
 	<div class="min-h-screen flex items-center justify-center bg-gray-50">
 		<div class="text-center">
-			<h2 class="text-xl font-semibold mb-2">Please log in to sell</h2>
-			<p class="text-gray-600">You need an account to list items</p>
+			<h2 class="text-xl font-semibold mb-2">{m.sell_login_required()}</h2>
+			<p class="text-gray-600">{m.sell_need_account()}</p>
 		</div>
 	</div>
 {/if}

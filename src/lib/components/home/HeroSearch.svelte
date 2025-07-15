@@ -4,6 +4,7 @@
 	import { cn } from '$lib/utils';
 	import CategoryDropdown from '$lib/components/shared/CategoryDropdown.svelte';
 	import type { Category } from '$lib/types';
+	import * as m from '$lib/paraglide/messages.js';
 	
 	interface Props {
 		categories?: Category[];
@@ -16,19 +17,19 @@
 	let isCategoryDropdownOpen = $state(false);
 	
 	const trendingSearches = [
-		'vintage levis',
-		'designer bags',
-		'nike trainers',
-		'zara dress',
-		'north face jacket'
+		m.search_vintage_levis(),
+		m.search_designer_bags(),
+		m.search_nike_trainers(),
+		m.search_zara_dress(),
+		m.search_north_face_jacket()
 	];
 	
 	// Top trending categories - these would be dynamic based on analytics
 	const trendingCategories = [
-		{ icon: '👗', name: 'Dresses', value: 'dresses', trending: true },
-		{ icon: '👟', name: 'Trainers', value: 'trainers', trending: true },
-		{ icon: '👜', name: 'Bags', value: 'bags', trending: true },
-		{ icon: '🧥', name: 'Jackets', value: 'jackets', trending: true },
+		{ icon: '👗', name: m.category_dresses(), value: 'dresses', trending: true },
+		{ icon: '👟', name: m.category_trainers(), value: 'trainers', trending: true },
+		{ icon: '👜', name: m.category_bags(), value: 'bags', trending: true },
+		{ icon: '🧥', name: m.category_jackets(), value: 'jackets', trending: true },
 		{ icon: '👠', name: 'Shoes', value: 'shoes', trending: true },
 		{ icon: '👕', name: 'T-Shirts', value: 'tshirts', trending: true },
 		{ icon: '👖', name: 'Jeans', value: 'jeans', trending: true },
@@ -115,7 +116,7 @@
 						<div class="flex-1 min-w-0">
 							<input
 								type="search"
-								placeholder="Search for items, brands, or users..."
+								placeholder={m.browse_search_placeholder()}
 								bind:value={searchQuery}
 								onfocus={() => isFocused = true}
 								onblur={() => isFocused = false}
@@ -137,10 +138,10 @@
 					</div>
 					
 					<!-- Trending Category Links -->
-					<div class="border-t border-orange-100 py-3 md:py-2.5">
-						<div class="mx-4 flex items-center gap-2 md:gap-3 overflow-x-auto">
-							<span class="text-xs text-gray-500 flex-shrink-0 hidden md:block">Trending:</span>
-							{#each trendingCategories as category}
+					<div class="border-t border-orange-100 py-3 md:py-2.5 relative overflow-hidden">
+						<div class="mx-4 flex items-center gap-2 md:gap-3 overflow-x-auto relative">
+							<span class="text-xs text-gray-500 flex-shrink-0 hidden md:block">{m.search_trending()}:</span>
+							{#each trendingCategories as category, i}
 								<button
 									onclick={() => goToCategory(category.value)}
 									class="flex items-center gap-1 px-3 md:px-2.5 py-1.5 md:py-1 rounded-full bg-white/80 backdrop-blur-sm shadow-sm text-gray-800 hover:bg-white hover:shadow-md transition-all duration-200 text-xs font-medium whitespace-nowrap group"
@@ -150,13 +151,17 @@
 								</button>
 							{/each}
 						</div>
+						<!-- Gradient fade on right side for mobile -->
+						<div class="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-white via-white/80 to-transparent pointer-events-none md:hidden flex items-center justify-end pr-2">
+							<span class="text-gray-400 text-xs">→</span>
+						</div>
 					</div>
 				</div>
 			</div>
 			
 			<!-- Trending Searches - Compact -->
 			<div class="mt-3 flex items-center justify-center gap-2 flex-wrap text-xs md:text-sm">
-				<span class="text-gray-500">Trending:</span>
+				<span class="text-gray-500">{m.search_trending()}:</span>
 				{#each trendingSearches.slice(0, 3) as term}
 					<button
 						onclick={() => searchTrending(term)}

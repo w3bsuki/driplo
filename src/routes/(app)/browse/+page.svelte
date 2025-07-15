@@ -7,6 +7,7 @@
 	import SearchInput from '$lib/components/search/SearchInput.svelte';
 	import { cn } from '$lib/utils';
 	import type { PageData } from './$types';
+	import * as m from '$lib/paraglide/messages.js';
 
 	let { data }: { data: PageData } = $props();
 
@@ -30,25 +31,25 @@
 
 	// Derive categories with "All" option
 	const categoriesWithAll = $derived([
-		{ id: '', name: 'All', slug: '', icon_url: null, parent_id: null },
+		{ id: '', name: m.browse_all(), slug: '', icon_url: null, parent_id: null },
 		...data.categories
 	]);
 
 	// Available condition options
 	const conditionOptions = [
-		{ value: 'new_with_tags', label: 'New with tags' },
-		{ value: 'like_new', label: 'Like new' },
-		{ value: 'good', label: 'Good' },
-		{ value: 'fair', label: 'Fair' },
-		{ value: 'poor', label: 'Poor' }
+		{ value: 'new_with_tags', label: m.condition_new_with_tags() },
+		{ value: 'like_new', label: m.condition_like_new() },
+		{ value: 'good', label: m.condition_good() },
+		{ value: 'fair', label: m.condition_fair() },
+		{ value: 'poor', label: m.condition_poor() }
 	];
 
 	const sortOptions = [
-		{ value: 'recent', label: 'Most recent' },
-		{ value: 'price-low', label: 'Price: Low to High' },
-		{ value: 'price-high', label: 'Price: High to Low' },
-		{ value: 'popular', label: 'Most popular' },
-		{ value: 'liked', label: 'Most liked' }
+		{ value: 'recent', label: m.sort_recent() },
+		{ value: 'price-low', label: m.sort_price_low() },
+		{ value: 'price-high', label: m.sort_price_high() },
+		{ value: 'popular', label: m.sort_popular() },
+		{ value: 'liked', label: m.sort_liked() }
 	];
 
 	function buildFilterUrl(updates: Record<string, any> = {}) {
@@ -197,7 +198,7 @@
 </script>
 
 <svelte:head>
-	<title>Browse Fashion - Threadly</title>
+	<title>{m.header_browse()} - Driplo</title>
 </svelte:head>
 
 <div class="min-h-screen bg-background">
@@ -240,7 +241,7 @@
 					onclick={() => mobileFiltersOpen = true}
 				>
 					<Filter class="h-4 w-4 mr-2" />
-					Filters
+					{m.browse_filters()}
 				</Button>
 			</div>
 		</div>
@@ -253,7 +254,7 @@
 				<div class="sticky top-24 space-y-6">
 					<!-- Desktop Search -->
 					<div>
-						<h3 class="font-semibold mb-3">Search</h3>
+						<h3 class="font-semibold mb-3">{m.header_search_placeholder()}</h3>
 						<SearchInput
 							value={searchInput}
 							onSearch={handleSearch}
@@ -263,7 +264,7 @@
 
 					<!-- Categories -->
 					<div>
-						<h3 class="font-semibold mb-3">Categories</h3>
+						<h3 class="font-semibold mb-3">{m.browse_categories()}</h3>
 						<div class="space-y-1">
 							{#each categoriesWithAll as category}
 								<button
@@ -283,19 +284,19 @@
 
 					<!-- Price Range -->
 					<div>
-						<h3 class="font-semibold mb-3">Price Range</h3>
+						<h3 class="font-semibold mb-3">{m.browse_price_range()}</h3>
 						<div class="space-y-2">
 							<div class="flex gap-2">
 								<input
 									type="number"
-									placeholder="Min"
+									placeholder={m.browse_price_min()}
 									bind:value={priceRange.min}
 									onblur={updatePriceRange}
 									class="w-full rounded border border-input px-2 py-1 text-sm"
 								/>
 								<input
 									type="number"
-									placeholder="Max"
+									placeholder={m.browse_price_max()}
 									bind:value={priceRange.max}
 									onblur={updatePriceRange}
 									class="w-full rounded border border-input px-2 py-1 text-sm"
@@ -309,7 +310,7 @@
 
 					<!-- Sizes -->
 					<div>
-						<h3 class="font-semibold mb-3">Size</h3>
+						<h3 class="font-semibold mb-3">{m.browse_size()}</h3>
 						<div class="grid grid-cols-3 gap-2">
 							{#each sizeOptions as size}
 								<button
@@ -329,7 +330,7 @@
 
 					<!-- Conditions -->
 					<div>
-						<h3 class="font-semibold mb-3">Condition</h3>
+						<h3 class="font-semibold mb-3">{m.browse_condition()}</h3>
 						<div class="space-y-2">
 							{#each conditionOptions as condition}
 								<label class="flex items-center space-x-2 text-sm">
@@ -347,7 +348,7 @@
 
 					<!-- Brands -->
 					<div>
-						<h3 class="font-semibold mb-3">Brand</h3>
+						<h3 class="font-semibold mb-3">{m.browse_brand()}</h3>
 						<div class="space-y-2 max-h-40 overflow-y-auto">
 							{#each data.popularBrands as brand}
 								<label class="flex items-center space-x-2 text-sm">
@@ -365,7 +366,7 @@
 
 					<!-- Clear Filters -->
 					<Button variant="outline" onclick={clearAllFilters} class="w-full">
-						Clear all filters
+						{m.browse_clear_filters()}
 					</Button>
 				</div>
 			</aside>
@@ -446,7 +447,7 @@
 							</span>
 						{/if}
 						<Button variant="ghost" size="sm" onclick={clearAllFilters}>
-							Clear all
+							{m.browse_clear_filters()}
 						</Button>
 					</div>
 				{/if}
@@ -480,7 +481,7 @@
 			<div class="fixed inset-x-0 bottom-0 bg-background rounded-t-xl max-h-[80vh] overflow-y-auto">
 				<div class="p-4 border-b">
 					<div class="flex items-center justify-between">
-						<h2 class="text-lg font-semibold">Filters</h2>
+						<h2 class="text-lg font-semibold">{m.browse_filters()}</h2>
 						<button onclick={() => mobileFiltersOpen = false}>
 							<X class="h-6 w-6" />
 						</button>
@@ -490,18 +491,18 @@
 				<div class="p-4 space-y-6">
 					<!-- Mobile Price Range -->
 					<div>
-						<h3 class="font-semibold mb-3">Price Range</h3>
+						<h3 class="font-semibold mb-3">{m.browse_price_range()}</h3>
 						<div class="space-y-2">
 							<div class="flex gap-2">
 								<input
 									type="number"
-									placeholder="Min"
+									placeholder={m.browse_price_min()}
 									bind:value={priceRange.min}
 									class="w-full rounded border border-input px-3 py-2"
 								/>
 								<input
 									type="number"
-									placeholder="Max"
+									placeholder={m.browse_price_max()}
 									bind:value={priceRange.max}
 									class="w-full rounded border border-input px-3 py-2"
 								/>
@@ -514,7 +515,7 @@
 
 					<!-- Mobile Sizes -->
 					<div>
-						<h3 class="font-semibold mb-3">Size</h3>
+						<h3 class="font-semibold mb-3">{m.browse_size()}</h3>
 						<div class="grid grid-cols-4 gap-2">
 							{#each sizeOptions as size}
 								<button
@@ -534,7 +535,7 @@
 
 					<!-- Mobile Conditions -->
 					<div>
-						<h3 class="font-semibold mb-3">Condition</h3>
+						<h3 class="font-semibold mb-3">{m.browse_condition()}</h3>
 						<div class="space-y-2">
 							{#each conditionOptions as condition}
 								<label class="flex items-center space-x-2 text-sm">
@@ -552,7 +553,7 @@
 
 					<!-- Mobile Brands -->
 					<div>
-						<h3 class="font-semibold mb-3">Brand</h3>
+						<h3 class="font-semibold mb-3">{m.browse_brand()}</h3>
 						<div class="space-y-2 max-h-32 overflow-y-auto">
 							{#each data.popularBrands.slice(0, 10) as brand}
 								<label class="flex items-center space-x-2 text-sm">
@@ -586,10 +587,10 @@
 				<div class="p-4 border-t">
 					<div class="flex gap-3">
 						<Button variant="outline" onclick={clearAllFilters} class="flex-1">
-							Clear all
+							{m.browse_clear_filters()}
 						</Button>
 						<Button onclick={() => mobileFiltersOpen = false} class="flex-1">
-							Show {data.totalCount.toLocaleString()} results
+							{m.browse_items_count({ count: data.totalCount.toLocaleString() })}
 						</Button>
 					</div>
 				</div>

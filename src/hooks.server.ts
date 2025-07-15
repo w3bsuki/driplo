@@ -2,8 +2,12 @@ import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/publi
 import { createServerClient } from '@supabase/ssr'
 import type { Handle } from '@sveltejs/kit'
 import type { Database } from '$lib/types/database'
+import { i18n } from '$lib/i18n.js'
+import { sequence } from '@sveltejs/kit/hooks'
 
-export const handle: Handle = async ({ event, resolve }) => {
+const handleParaglide = i18n.handle()
+
+const handleSupabase: Handle = async ({ event, resolve }) => {
 	/**
 	 * Creates a Supabase client specific to this server request.
 	 * The Supabase client gets the Auth token from the request cookies.
@@ -64,3 +68,5 @@ export const handle: Handle = async ({ event, resolve }) => {
 		}
 	})
 }
+
+export const handle = sequence(handleParaglide, handleSupabase)
