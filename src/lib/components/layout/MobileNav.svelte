@@ -1,18 +1,18 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { cn } from '$lib/utils';
-	import { Search, Camera, Filter, Heart, MessageCircle } from 'lucide-svelte';
+	import { Filter, Search, Camera, Heart, ShoppingCart } from 'lucide-svelte';
 	import MobileFiltersDrawer from './MobileFiltersDrawer.svelte';
 	import * as m from '$lib/paraglide/messages.js';
 	
 	let showFilters = $state(false);
 	
 	const navItems = $derived([
-		{ href: '/browse', icon: Search, label: m.nav_browse() },
-		{ href: '/sell', icon: Camera, label: m.nav_sell(), isPrimary: true },
 		{ href: '#filters', icon: Filter, label: m.nav_filters(), isAction: true },
+		{ href: '/browse', icon: Search, label: m.nav_buy() },
+		{ href: '/sell', icon: Camera, label: m.nav_sell(), isPrimary: true },
 		{ href: '/wishlist', icon: Heart, label: m.nav_wishlist() },
-		{ href: '/messages', icon: MessageCircle, label: m.nav_messages() }
+		{ href: '/cart', icon: ShoppingCart, label: m.nav_cart() }
 	]);
 	
 	function handleNavClick(item: any) {

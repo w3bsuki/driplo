@@ -36,9 +36,34 @@ export const load: PageServerLoad = async () => {
     .order('view_count', { ascending: false })
     .limit(16);
 
+  // Get top sellers based on sales count and rating
+  const { data: topSellers } = await supabase
+    .from('profiles')
+    .select(`
+      id,
+      username,
+      avatar_url,
+      seller_rating,
+      seller_rating_count,
+      total_sales,
+      followers_count,
+      profile_views,
+      verification_badges,
+      bio,
+      location,
+      member_since
+    `)
+    .not('total_sales', 'is', null)
+    .gte('total_sales', 1)
+    .gte('seller_rating', 1.0)
+    .order('total_sales', { ascending: false })
+    .order('seller_rating', { ascending: false })
+    .limit(5);
+
   return {
     categories: categories || [],
     featuredListings: featuredListings || [],
-    popularListings: popularListings || []
+    popularListings: popularListings || [],
+    topSellers: topSellers || []
   };
 };

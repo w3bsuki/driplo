@@ -135,16 +135,8 @@
 		</div>
 
 		<!-- Mobile Actions -->
-		<div class="flex md:hidden items-center gap-1 ml-auto">
-			<a href="/cart" class="relative p-2.5 hover:bg-gray-50 rounded-xl transition-all duration-200 group">
-				<ShoppingBag class="h-5 w-5 text-gray-600 group-hover:text-orange-600 transition-colors" />
-				<span class="sr-only">{m.header_my_cart()}</span>
-				<!-- Cart Badge -->
-				<div class="absolute -top-0.5 -right-0.5 h-5 w-5 bg-orange-500 rounded-full flex items-center justify-center shadow-sm">
-					<span class="text-[10px] text-white font-semibold">0</span>
-				</div>
-			</a>
-			<a href={$user ? ($profile?.username ? `/profile/${$profile.username}` : '/profile') : '/login'} class="relative p-1 hover:bg-gray-50 rounded-xl transition-all duration-200 group">
+		<div class="flex md:hidden items-center ml-auto">
+			<a href={$user ? ($profile?.username ? `/profile/${$profile.username}` : '/profile') : '/login'} class="relative p-2 hover:bg-gray-50 rounded-xl transition-all duration-200 group">
 				{#if $user}
 					{#if $profile?.avatar_url}
 						<img src={$profile.avatar_url} alt="Profile" class="h-8 w-8 rounded-xl border-2 border-gray-200 group-hover:border-orange-300 transition-all object-cover" />
