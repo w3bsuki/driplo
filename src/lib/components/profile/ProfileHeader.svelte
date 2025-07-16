@@ -5,6 +5,7 @@
 	import type { Profile } from '$lib/types/unified'
 	import { getAchievementIcon, getAchievementColor } from '$lib/data/achievements'
 	import { auth } from '$lib/stores/auth'
+	import * as m from '$lib/paraglide/messages.js'
 	
 	interface Props {
 		profile: Profile
@@ -114,7 +115,7 @@
 						class="text-xs sm:text-sm border-orange-500 text-orange-600 hover:bg-orange-50"
 						onclick={onEditProfile}
 					>
-						Edit Profile
+						{m.profile_header_edit()}
 					</Button>
 				{:else}
 					<Button
@@ -128,10 +129,10 @@
 					>
 						{#if isFollowing}
 							<UserMinus class="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
-							Following
+							{m.profile_header_following()}
 						{:else}
 							<UserPlus class="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
-							Follow
+							{m.profile_header_follow()}
 						{/if}
 					</Button>
 					<Button
@@ -141,7 +142,7 @@
 						onclick={onMessage}
 					>
 						<MessageCircle class="w-3 h-3 sm:w-4 sm:h-4 sm:mr-1" />
-						<span class="hidden sm:inline">Message</span>
+						<span class="hidden sm:inline">{m.profile_header_message()}</span>
 					</Button>
 				{/if}
 			</div>
@@ -166,15 +167,15 @@
 		<div class="grid grid-cols-3 gap-3 mb-4 text-center">
 			<div class="bg-orange-50 rounded-xl p-3">
 				<div class="text-lg sm:text-xl font-bold text-gray-900">{profile.followers_count}</div>
-				<div class="text-xs text-gray-600">Followers</div>
+				<div class="text-xs text-gray-600">{m.profile_header_followers()}</div>
 			</div>
 			<div class="bg-orange-50 rounded-xl p-3">
 				<div class="text-lg sm:text-xl font-bold text-gray-900">{profile.following_count}</div>
-				<div class="text-xs text-gray-600">Following</div>
+				<div class="text-xs text-gray-600">{m.profile_header_following_count()}</div>
 			</div>
 			<div class="bg-orange-50 rounded-xl p-3">
 				<div class="text-lg sm:text-xl font-bold text-gray-900">{profile.listings_count}</div>
-				<div class="text-xs text-gray-600">Listings</div>
+				<div class="text-xs text-gray-600">{m.profile_header_listings_count()}</div>
 			</div>
 		</div>
 		
@@ -193,7 +194,7 @@
 			{/if}
 			<div class="flex items-center gap-1 text-gray-600 bg-gray-100 px-2 py-1 rounded-full">
 				<Calendar class="w-3 h-3" />
-				<span>Joined {formatJoinDate(profile.member_since)}</span>
+				<span>{m.profile_header_joined({ date: formatJoinDate(profile.member_since) })}</span>
 			</div>
 			{#if profile.seller_rating > 0}
 				<div class="flex items-center gap-1 text-orange-600 bg-orange-100 px-2 py-1 rounded-full font-medium">
@@ -223,7 +224,7 @@
 		{#if isOwnProfile && completionScore < 100}
 			<div class="mt-4 bg-orange-50 rounded-xl p-3">
 				<div class="flex items-center justify-between mb-2">
-					<span class="text-sm font-medium text-gray-700">Profile Completion</span>
+					<span class="text-sm font-medium text-gray-700">{m.profile_header_completion()}</span>
 					<span class="text-sm font-bold text-orange-600">{completionScore}%</span>
 				</div>
 				<div class="w-full bg-orange-200 rounded-full h-2">

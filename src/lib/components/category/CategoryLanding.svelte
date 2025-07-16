@@ -239,7 +239,7 @@
       {#if hasActiveFilters}
         <button
           onclick={clearFilters}
-          class="text-purple-600 hover:text-purple-700 font-medium"
+          class="text-primary hover:text-primary/80 font-medium"
         >
           Clear filters and show all
         </button>

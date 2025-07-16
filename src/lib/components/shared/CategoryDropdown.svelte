@@ -4,6 +4,7 @@
 	import { cn } from '$lib/utils';
 	import { clickOutside } from '$lib/actions';
 	import type { Category } from '$lib/types';
+	import * as m from '$lib/paraglide/messages.js';
 
 	interface Props {
 		categories?: Category[];
@@ -28,86 +29,86 @@
 	const categoryHierarchy = $derived([
 		{
 			slug: '',
-			name: 'All Categories',
+			name: m.category_all(),
 			icon: '🔍',
 			subcategories: [
-				{ name: 'Browse All', slug: 'all', icon: '👀' },
-				{ name: 'New Arrivals', slug: 'new', icon: '✨' },
-				{ name: 'Sale Items', slug: 'sale', icon: '🏷️' }
+				{ name: m.category_browse_all(), slug: 'all', icon: '👀' },
+				{ name: m.category_new_arrivals(), slug: 'new', icon: '✨' },
+				{ name: m.category_sale_items(), slug: 'sale', icon: '🏷️' }
 			]
 		},
 		{
 			slug: 'women',
-			name: 'Women',
+			name: m.category_women(),
 			icon: '👩',
 			subcategories: [
-				{ name: 'Dresses', slug: 'dresses', icon: '👗' },
-				{ name: 'Tops & Blouses', slug: 'tops', icon: '👚' },
-				{ name: 'Skirts', slug: 'skirts', icon: '👗' },
-				{ name: 'Pants & Jeans', slug: 'pants', icon: '👖' },
-				{ name: 'Jackets & Coats', slug: 'jackets', icon: '🧥' },
-				{ name: 'Shoes', slug: 'shoes', icon: '👠' },
-				{ name: 'Bags & Accessories', slug: 'bags', icon: '👜' },
-				{ name: 'Jewelry', slug: 'jewelry', icon: '💍' },
-				{ name: 'Lingerie', slug: 'lingerie', icon: '👙' },
-				{ name: 'Activewear', slug: 'activewear', icon: '🏃‍♀️' }
+				{ name: m.subcategory_dresses(), slug: 'dresses', icon: '👗' },
+				{ name: m.women_tops_blouses(), slug: 'tops', icon: '👚' },
+				{ name: m.women_skirts(), slug: 'skirts', icon: '👗' },
+				{ name: m.women_pants_jeans(), slug: 'pants', icon: '👖' },
+				{ name: m.women_jackets_coats(), slug: 'jackets', icon: '🧥' },
+				{ name: m.women_shoes(), slug: 'shoes', icon: '👠' },
+				{ name: m.women_bags_accessories(), slug: 'bags', icon: '👜' },
+				{ name: m.subcategory_jewelry(), slug: 'jewelry', icon: '💍' },
+				{ name: m.women_lingerie(), slug: 'lingerie', icon: '👙' },
+				{ name: m.women_activewear(), slug: 'activewear', icon: '🏃‍♀️' }
 			]
 		},
 		{
 			slug: 'men',
-			name: 'Men',
+			name: m.category_men(),
 			icon: '👨',
 			subcategories: [
-				{ name: 'T-Shirts', slug: 'tshirts', icon: '👕' },
-				{ name: 'Shirts', slug: 'shirts', icon: '👔' },
-				{ name: 'Pants & Jeans', slug: 'pants', icon: '👖' },
-				{ name: 'Jackets & Coats', slug: 'jackets', icon: '🧥' },
-				{ name: 'Hoodies & Sweatshirts', slug: 'hoodies', icon: '👕' },
-				{ name: 'Shoes', slug: 'shoes', icon: '👞' },
-				{ name: 'Accessories', slug: 'accessories', icon: '⌚' },
-				{ name: 'Suits & Formal', slug: 'suits', icon: '🤵' },
-				{ name: 'Activewear', slug: 'activewear', icon: '🏃‍♂️' },
-				{ name: 'Underwear', slug: 'underwear', icon: '🩲' }
+				{ name: m.men_tshirts(), slug: 'tshirts', icon: '👕' },
+				{ name: m.men_shirts(), slug: 'shirts', icon: '👔' },
+				{ name: m.men_pants_jeans(), slug: 'pants', icon: '👖' },
+				{ name: m.men_jackets_coats(), slug: 'jackets', icon: '🧥' },
+				{ name: m.men_hoodies_sweatshirts(), slug: 'hoodies', icon: '👕' },
+				{ name: m.men_shoes(), slug: 'shoes', icon: '👞' },
+				{ name: m.men_accessories(), slug: 'accessories', icon: '⌚' },
+				{ name: m.men_suits_formal(), slug: 'suits', icon: '🤵' },
+				{ name: m.men_activewear(), slug: 'activewear', icon: '🏃‍♂️' },
+				{ name: m.men_underwear(), slug: 'underwear', icon: '🩲' }
 			]
 		},
 		{
 			slug: 'kids',
-			name: 'Kids',
+			name: m.category_kids(),
 			icon: '👶',
 			subcategories: [
-				{ name: 'Baby (0-24m)', slug: 'baby', icon: '👶' },
-				{ name: 'Girls (2-16y)', slug: 'girls', icon: '👧' },
-				{ name: 'Boys (2-16y)', slug: 'boys', icon: '👦' },
-				{ name: 'Shoes', slug: 'shoes', icon: '👟' },
-				{ name: 'School Uniforms', slug: 'school', icon: '🎒' },
-				{ name: 'Toys & Games', slug: 'toys', icon: '🧸' },
-				{ name: 'Maternity', slug: 'maternity', icon: '🤱' }
+				{ name: m.kids_baby(), slug: 'baby', icon: '👶' },
+				{ name: m.kids_girls(), slug: 'girls', icon: '👧' },
+				{ name: m.kids_boys(), slug: 'boys', icon: '👦' },
+				{ name: m.kids_shoes(), slug: 'shoes', icon: '👟' },
+				{ name: m.kids_school_uniforms(), slug: 'school', icon: '🎒' },
+				{ name: m.kids_toys_games(), slug: 'toys', icon: '🧸' },
+				{ name: m.kids_maternity(), slug: 'maternity', icon: '🤱' }
 			]
 		},
 		{
 			slug: 'designer',
-			name: 'Designer',
+			name: m.category_designer(),
 			icon: '💎',
 			subcategories: [
-				{ name: 'Luxury Handbags', slug: 'handbags', icon: '👜' },
-				{ name: 'Designer Shoes', slug: 'shoes', icon: '👠' },
-				{ name: 'Designer Dresses', slug: 'dresses', icon: '👗' },
-				{ name: 'Luxury Watches', slug: 'watches', icon: '⌚' },
-				{ name: 'Fine Jewelry', slug: 'jewelry', icon: '💍' },
-				{ name: 'Designer Sunglasses', slug: 'sunglasses', icon: '🕶️' },
-				{ name: 'Vintage Pieces', slug: 'vintage', icon: '🕰️' }
+				{ name: m.designer_luxury_handbags(), slug: 'handbags', icon: '👜' },
+				{ name: m.designer_shoes(), slug: 'shoes', icon: '👠' },
+				{ name: m.designer_dresses(), slug: 'dresses', icon: '👗' },
+				{ name: m.designer_luxury_watches(), slug: 'watches', icon: '⌚' },
+				{ name: m.designer_fine_jewelry(), slug: 'jewelry', icon: '💍' },
+				{ name: m.designer_sunglasses(), slug: 'sunglasses', icon: '🕶️' },
+				{ name: m.designer_vintage_pieces(), slug: 'vintage', icon: '🕰️' }
 			]
 		},
 		{
 			slug: 'home',
-			name: 'Home & Living',
+			name: m.category_home(),
 			icon: '🏠',
 			subcategories: [
-				{ name: 'Furniture', slug: 'furniture', icon: '🪑' },
-				{ name: 'Decor', slug: 'decor', icon: '🖼️' },
-				{ name: 'Kitchen', slug: 'kitchen', icon: '🍽️' },
-				{ name: 'Bedding', slug: 'bedding', icon: '🛏️' },
-				{ name: 'Lighting', slug: 'lighting', icon: '💡' }
+				{ name: m.home_furniture(), slug: 'furniture', icon: '🪑' },
+				{ name: m.home_decor(), slug: 'decor', icon: '🖼️' },
+				{ name: m.home_kitchen(), slug: 'kitchen', icon: '🍽️' },
+				{ name: m.home_bedding(), slug: 'bedding', icon: '🛏️' },
+				{ name: m.home_lighting(), slug: 'lighting', icon: '💡' }
 			]
 		}
 	]);
@@ -181,7 +182,7 @@
 									{category.name}
 								</div>
 								<div class="text-xs text-gray-500">
-									{category.subcategories.length} subcategories
+									{m.category_subcategories_count({ count: category.subcategories.length })}
 								</div>
 							</div>
 						</div>
@@ -194,7 +195,7 @@
 								}}
 								class="text-xs text-orange-600 hover:text-orange-700 px-2 py-1 rounded-md hover:bg-orange-100 transition-colors cursor-pointer"
 							>
-								View All
+								{m.category_view_all()}
 							</span>
 							<ChevronRight class={cn(
 								"h-4 w-4 transition-transform duration-200",
@@ -229,7 +230,7 @@
 		<!-- Footer -->
 		<div class="border-t border-gray-200 p-4 bg-gray-50">
 			<div class="flex items-center justify-between text-sm">
-				<span class="text-gray-600">Need help finding something?</span>
+				<span class="text-gray-600">{m.category_need_help()}</span>
 				<button
 					onclick={() => {
 						onClose();
@@ -237,7 +238,7 @@
 					}}
 					class="text-orange-600 hover:text-orange-700 font-medium"
 				>
-					Browse All →
+					{m.category_browse_all_link()}
 				</button>
 			</div>
 		</div>

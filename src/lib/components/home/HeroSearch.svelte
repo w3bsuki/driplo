@@ -30,12 +30,12 @@
 		{ icon: '👟', name: m.category_trainers(), value: 'trainers', trending: true },
 		{ icon: '👜', name: m.category_bags(), value: 'bags', trending: true },
 		{ icon: '🧥', name: m.category_jackets(), value: 'jackets', trending: true },
-		{ icon: '👠', name: 'Shoes', value: 'shoes', trending: true },
-		{ icon: '👕', name: 'T-Shirts', value: 'tshirts', trending: true },
-		{ icon: '👖', name: 'Jeans', value: 'jeans', trending: true },
-		{ icon: '⌚', name: 'Watches', value: 'watches', trending: true },
-		{ icon: '💍', name: 'Jewelry', value: 'jewelry', trending: true },
-		{ icon: '🕶️', name: 'Sunglasses', value: 'sunglasses', trending: true }
+		{ icon: '👠', name: m.subcategory_shoes_all(), value: 'shoes', trending: true },
+		{ icon: '👕', name: m.subcategory_tshirts(), value: 'tshirts', trending: true },
+		{ icon: '👖', name: m.subcategory_jeans(), value: 'jeans', trending: true },
+		{ icon: '⌚', name: m.subcategory_watches(), value: 'watches', trending: true },
+		{ icon: '💍', name: m.subcategory_jewelry(), value: 'jewelry', trending: true },
+		{ icon: '🕶️', name: m.subcategory_sunglasses(), value: 'sunglasses', trending: true }
 	];
 	
 	function handleSearch() {
@@ -93,7 +93,7 @@
 							>
 								<span class={cn(
 									isCategoryDropdownOpen ? "text-white" : "text-gray-900"
-								)}>Categories</span>
+								)}>{m.header_categories()}</span>
 								<ChevronDown class={cn(
 									"h-4 w-4 transition-transform duration-200",
 									isCategoryDropdownOpen && "rotate-180",
@@ -138,22 +138,22 @@
 					</div>
 					
 					<!-- Trending Category Links -->
-					<div class="border-t border-orange-100 py-3 md:py-2.5 relative overflow-hidden">
-						<div class="mx-4 flex items-center gap-2 md:gap-3 overflow-x-auto relative">
-							<span class="text-xs text-gray-500 flex-shrink-0 hidden md:block">{m.search_trending()}:</span>
+					<div class="border-t border-orange-100 py-3 md:py-3 relative overflow-hidden">
+						<div class="mx-4 flex items-center gap-2.5 md:gap-3 overflow-x-auto relative">
+							<span class="text-xs text-gray-500 flex-shrink-0 hidden md:block font-medium">{m.search_trending()}:</span>
 							{#each trendingCategories as category, i}
 								<button
 									onclick={() => goToCategory(category.value)}
-									class="flex items-center gap-1 px-3 md:px-2.5 py-1.5 md:py-1 rounded-full bg-white/80 backdrop-blur-sm shadow-sm text-gray-800 hover:bg-white hover:shadow-md transition-all duration-200 text-xs font-medium whitespace-nowrap group"
+									class="flex items-center gap-1.5 px-3 md:px-3 py-2 md:py-1.5 rounded-full bg-gradient-to-r from-orange-50 to-orange-100 border border-orange-200 text-gray-800 hover:from-orange-100 hover:to-orange-200 hover:border-orange-300 hover:shadow-sm hover:scale-105 transition-all duration-200 text-xs font-medium whitespace-nowrap group active:scale-95"
 								>
-									<span class="text-sm">{category.icon}</span>
-									<span>{category.name}</span>
+									<span class="text-sm group-hover:scale-110 transition-transform duration-200">{category.icon}</span>
+									<span class="group-hover:text-orange-800 transition-colors duration-200">{category.name}</span>
 								</button>
 							{/each}
 						</div>
 						<!-- Gradient fade on right side for mobile -->
 						<div class="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-white via-white/80 to-transparent pointer-events-none md:hidden flex items-center justify-end pr-2">
-							<span class="text-gray-400 text-xs">→</span>
+							<span class="text-orange-400 text-xs animate-pulse">→</span>
 						</div>
 					</div>
 				</div>

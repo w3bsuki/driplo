@@ -2,6 +2,7 @@
 	import { Badge } from '$lib/components/ui/badge'
 	import { TrendingUp, Star, Clock, Package, Award, Eye, DollarSign, Shield } from 'lucide-svelte'
 	import type { Profile } from '$lib/types/unified'
+	import * as m from '$lib/paraglide/messages.js'
 	
 	interface Props {
 		profile: Profile
@@ -50,7 +51,7 @@
 	<div class="bg-gradient-to-r from-orange-500 to-red-500 p-4 text-white">
 		<h3 class="text-lg font-semibold flex items-center gap-2">
 			<TrendingUp class="w-5 h-5" />
-			Seller Performance
+			{m.profile_stats_title()}
 		</h3>
 	</div>
 	
@@ -69,7 +70,7 @@
 					{/if}
 				</div>
 				<p class="text-xs text-gray-600">
-					{sellerPerformance.ratingCount} reviews
+					{sellerPerformance.ratingCount} {m.profile_stats_rating()}
 				</p>
 			</div>
 			
@@ -78,7 +79,7 @@
 				<div class="text-xl font-bold text-gray-900 mb-1">
 					{sellerPerformance.totalSales}
 				</div>
-				<p class="text-xs text-gray-600">Total Sales</p>
+				<p class="text-xs text-gray-600">{m.profile_stats_total_sales()}</p>
 			</div>
 			
 			<!-- Response Time -->
@@ -89,7 +90,7 @@
 						{sellerPerformance.responseTime}h
 					</span>
 				</div>
-				<p class="text-xs text-gray-600">Response</p>
+				<p class="text-xs text-gray-600">{m.profile_stats_response()}</p>
 			</div>
 			
 			<!-- Profile Views -->
@@ -103,7 +104,7 @@
 						}
 					</span>
 				</div>
-				<p class="text-xs text-gray-600">Views</p>
+				<p class="text-xs text-gray-600">{m.profile_stats_views()}</p>
 			</div>
 		</div>
 		
@@ -114,21 +115,21 @@
 					{#if sellerPerformance.isTopRated}
 						<div class="flex items-center gap-1.5 bg-gradient-to-r from-orange-100 to-yellow-100 text-orange-800 px-3 py-1.5 rounded-full text-xs font-medium">
 							<Star class="w-3.5 h-3.5" />
-							Top Rated
+							{m.profile_stats_top_rated()}
 						</div>
 					{/if}
 					
 					{#if sellerPerformance.isFastShipper}
 						<div class="flex items-center gap-1.5 bg-green-100 text-green-800 px-3 py-1.5 rounded-full text-xs font-medium">
 							<Clock class="w-3.5 h-3.5" />
-							Fast Shipper
+							{m.profile_stats_fast_shipper()}
 						</div>
 					{/if}
 					
 					{#if sellerPerformance.isPowerSeller}
 						<div class="flex items-center gap-1.5 bg-blue-100 text-blue-800 px-3 py-1.5 rounded-full text-xs font-medium">
 							<TrendingUp class="w-3.5 h-3.5" />
-							Power Seller
+							{m.profile_stats_power_seller()}
 						</div>
 					{/if}
 				</div>
@@ -137,7 +138,7 @@
 			{#if profile.verification_badges?.includes('business')}
 				<div class="flex items-center gap-1.5 bg-purple-100 text-purple-800 px-3 py-1.5 rounded-full text-xs font-medium w-fit">
 					<Shield class="w-3.5 h-3.5" />
-					Business Verified
+					{m.profile_stats_business_verified()}
 				</div>
 			{/if}
 		</div>
@@ -145,12 +146,12 @@
 		{#if showDetailedStats && metrics}
 			<!-- Detailed Performance Section -->
 			<div class="pt-3 border-t border-gray-100 space-y-3">
-				<h4 class="text-sm font-semibold text-gray-900">Performance Metrics</h4>
+				<h4 class="text-sm font-semibold text-gray-900">{m.profile_stats_performance_metrics()}</h4>
 				
 				<!-- Completion Rate -->
 				<div>
 					<div class="flex justify-between items-center mb-1">
-						<span class="text-xs text-gray-600">Order Completion</span>
+						<span class="text-xs text-gray-600">{m.profile_stats_order_completion()}</span>
 						<span class="text-xs font-semibold">{metrics.completion_rate}%</span>
 					</div>
 					<div class="w-full bg-gray-200 rounded-full h-1.5">
@@ -164,7 +165,7 @@
 				<!-- Repeat Customers -->
 				<div>
 					<div class="flex justify-between items-center mb-1">
-						<span class="text-xs text-gray-600">Repeat Customers</span>
+						<span class="text-xs text-gray-600">{m.profile_stats_repeat_customers()}</span>
 						<span class="text-xs font-semibold">{metrics.repeat_customer_rate}%</span>
 					</div>
 					<div class="w-full bg-gray-200 rounded-full h-1.5">
@@ -181,13 +182,13 @@
 						<div class="text-base font-bold text-gray-900">
 							{metrics.items_sold_last_30_days}
 						</div>
-						<p class="text-xs text-gray-600">Sales (30d)</p>
+						<p class="text-xs text-gray-600">{m.profile_stats_sales_30d()}</p>
 					</div>
 					<div class="bg-green-50 rounded-lg p-2.5 text-center">
 						<div class="text-base font-bold text-green-700">
 							{formatEarnings(metrics.revenue_last_30_days)}
 						</div>
-						<p class="text-xs text-gray-600">Revenue (30d)</p>
+						<p class="text-xs text-gray-600">{m.profile_stats_revenue_30d()}</p>
 					</div>
 				</div>
 			</div>
@@ -196,10 +197,10 @@
 		<!-- Trust Indicators -->
 		<div class="pt-3 border-t border-gray-100">
 			<div class="flex items-center justify-between text-xs">
-				<span class="text-gray-600">Member since {new Date(profile.member_since).getFullYear()}</span>
+				<span class="text-gray-600">{m.profile_stats_member_since({ year: new Date(profile.member_since).getFullYear() })}</span>
 				{#if profile.seller_level > 1}
 					<Badge class="bg-gradient-to-r from-orange-500 to-red-500 text-white text-xs">
-						Level {profile.seller_level}
+						{m.profile_stats_level({ level: profile.seller_level })}
 					</Badge>
 				{/if}
 			</div>

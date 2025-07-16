@@ -7,6 +7,7 @@
 	import { Save, ArrowLeft, User, Image as ImageIcon } from 'lucide-svelte'
 	import { toast } from 'svelte-sonner'
 	import type { PageData } from './$types'
+	import * as m from '$lib/paraglide/messages.js'
 
 	// Get page data from server
 	let { data }: { data: PageData } = $props()
@@ -42,10 +43,10 @@
 
 			const result = await response.json()
 			profile.avatar_url = result.url
-			toast.success('Avatar updated successfully')
+			toast.success(m.settings_avatar_updated())
 		} catch (error) {
 			console.error('Avatar upload error:', error)
-			toast.error('Failed to upload avatar')
+			toast.error(m.settings_avatar_error())
 		} finally {
 			uploadingAvatar = false
 		}
@@ -70,10 +71,10 @@
 
 			const result = await response.json()
 			profile.cover_url = result.url
-			toast.success('Cover image updated successfully')
+			toast.success(m.settings_cover_updated())
 		} catch (error) {
 			console.error('Cover upload error:', error)
-			toast.error('Failed to upload cover image')
+			toast.error(m.settings_cover_error())
 		} finally {
 			uploadingCover = false
 		}
@@ -81,7 +82,7 @@
 
 	async function saveProfile() {
 		if (!username.trim()) {
-			toast.error('Username is required')
+			toast.error(m.settings_username_required())
 			return
 		}
 
@@ -102,14 +103,14 @@
 
 			if (error) throw error
 
-			toast.success('Profile updated successfully')
+			toast.success(m.settings_profile_updated())
 			goto(`/profile/${username}`)
 		} catch (error: any) {
 			console.error('Save profile error:', error)
 			if (error.code === '23505') {
-				toast.error('Username already taken')
+				toast.error(m.settings_username_taken())
 			} else {
-				toast.error('Failed to save profile')
+				toast.error(m.settings_save_error())
 			}
 		} finally {
 			saving = false
@@ -126,7 +127,7 @@
 </script>
 
 <svelte:head>
-	<title>Profile Settings - Threadly</title>
+	<title>{m.settings_page_title()}</title>
 </svelte:head>
 
 <div class="min-h-screen bg-background">
@@ -136,9 +137,9 @@
 			<div class="flex items-center gap-4">
 				<Button variant="ghost" size="sm" onclick={goBack}>
 					<ArrowLeft class="h-4 w-4 mr-2" />
-					Back
+					{m.settings_back()}
 				</Button>
-				<h1 class="text-xl font-bold">Profile Settings</h1>
+				<h1 class="text-xl font-bold">{m.settings_header_title()}</h1>
 			</div>
 		</div>
 	</div>
@@ -148,11 +149,11 @@
 			<div>
 				<div class="flex items-center gap-2 mb-4">
 					<ImageIcon class="h-5 w-5" />
-					<h2 class="text-lg font-semibold">Cover Image</h2>
+					<h2 class="text-lg font-semibold">{m.settings_cover_image()}</h2>
 				</div>
 				<ImageUpload
 					currentImage={profile.cover_url}
-					placeholder="Upload cover image"
+					placeholder={m.settings_cover_image()}
 					aspectRatio="cover"
 					disabled={uploadingCover}
 					onupload={handleCoverUpload}
@@ -164,11 +165,11 @@
 			<div>
 				<div class="flex items-center gap-2 mb-4">
 					<User class="h-5 w-5" />
-					<h2 class="text-lg font-semibold">Profile Picture</h2>
+					<h2 class="text-lg font-semibold">{m.settings_profile_picture()}</h2>
 				</div>
 				<ImageUpload
 					currentImage={profile.avatar_url}
-					placeholder="Upload profile picture"
+					placeholder={m.settings_profile_picture()}
 					aspectRatio="square"
 					disabled={uploadingAvatar}
 					onupload={handleAvatarUpload}
@@ -178,19 +179,19 @@
 
 			<!-- Profile Information -->
 			<div class="space-y-6">
-				<h2 class="text-lg font-semibold">Profile Information</h2>
+				<h2 class="text-lg font-semibold">{m.settings_profile_info()}</h2>
 				
 				<div class="grid gap-6">
 					<!-- Full Name -->
 					<div>
 						<label for="fullName" class="block text-sm font-medium mb-2">
-							Full Name
+							{m.settings_full_name()}
 						</label>
 						<input
 							id="fullName"
 							type="text"
 							bind:value={fullName}
-							placeholder="Enter your full name"
+							placeholder={m.settings_full_name_placeholder()}
 							class="w-full px-4 py-2 border border-input rounded-lg bg-background"
 						/>
 					</div>
@@ -198,13 +199,13 @@
 					<!-- Username -->
 					<div>
 						<label for="username" class="block text-sm font-medium mb-2">
-							Username <span class="text-destructive">*</span>
+							{m.settings_username()} <span class="text-destructive">*</span>
 						</label>
 						<input
 							id="username"
 							type="text"
 							bind:value={username}
-							placeholder="Enter your username"
+							placeholder={m.settings_username_placeholder()}
 							class="w-full px-4 py-2 border border-input rounded-lg bg-background"
 							required
 						/>
@@ -213,12 +214,12 @@
 					<!-- Bio -->
 					<div>
 						<label for="bio" class="block text-sm font-medium mb-2">
-							Bio
+							{m.settings_bio()}
 						</label>
 						<textarea
 							id="bio"
 							bind:value={bio}
-							placeholder="Tell us about yourself..."
+							placeholder={m.settings_bio_placeholder()}
 							rows="4"
 							class="w-full px-4 py-2 border border-input rounded-lg bg-background resize-none"
 						></textarea>
@@ -227,13 +228,13 @@
 					<!-- Location -->
 					<div>
 						<label for="location" class="block text-sm font-medium mb-2">
-							Location
+							{m.settings_location()}
 						</label>
 						<input
 							id="location"
 							type="text"
 							bind:value={location}
-							placeholder="Where are you based?"
+							placeholder={m.settings_location_placeholder()}
 							class="w-full px-4 py-2 border border-input rounded-lg bg-background"
 						/>
 					</div>
@@ -241,13 +242,13 @@
 					<!-- Website -->
 					<div>
 						<label for="website" class="block text-sm font-medium mb-2">
-							Website
+							{m.settings_website()}
 						</label>
 						<input
 							id="website"
 							type="url"
 							bind:value={website}
-							placeholder="https://your-website.com"
+							placeholder={m.settings_website_placeholder()}
 							class="w-full px-4 py-2 border border-input rounded-lg bg-background"
 						/>
 					</div>
@@ -266,7 +267,7 @@
 					{:else}
 						<Save class="h-4 w-4 mr-2" />
 					{/if}
-					Save Changes
+					{m.settings_save_changes()}
 				</Button>
 			</div>
 		</div>

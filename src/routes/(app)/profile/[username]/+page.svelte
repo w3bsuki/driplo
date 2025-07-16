@@ -11,6 +11,7 @@
 	import { MessageCircle, Calendar, Package, Star, LogOut } from 'lucide-svelte'
 	import { toast } from 'svelte-sonner'
 	import type { PageData } from './$types'
+	import * as m from '$lib/paraglide/messages.js'
 	
 	// Get page data from server
 	let { data }: { data: PageData } = $props()
@@ -60,7 +61,7 @@
 	async function handleFollow() {
 		const currentUser = $authUser
 		if (!currentUser || !profile) {
-			toast.error('Please log in to follow users')
+			toast.error(m.profile_follow_error())
 			return
 		}
 		
@@ -73,7 +74,7 @@
 					.eq('follower_id', currentUser.id)
 					.eq('following_id', profile.id)
 				
-				toast.success('Unfollowed successfully')
+				toast.success(m.profile_unfollow_success())
 				isFollowing = false
 				profile.followers_count -= 1
 			} else {
@@ -85,23 +86,23 @@
 						following_id: profile.id
 					})
 				
-				toast.success('Following successfully')
+				toast.success(m.profile_follow_success())
 				isFollowing = true
 				profile.followers_count += 1
 			}
 		} catch (error) {
 			console.error('Follow error:', error)
-			toast.error('Failed to update follow status')
+			toast.error(m.profile_follow_update_error())
 		}
 	}
 	
 	function handleMessage() {
 		if (!$authUser) {
-			toast.error('Please log in to send messages')
+			toast.error(m.profile_message_error())
 			return
 		}
 		// TODO: Implement messaging
-		toast.info('Messaging feature coming soon!')
+		toast.info(m.profile_messaging_coming_soon())
 	}
 	
 	function handleEditProfile() {
@@ -111,10 +112,10 @@
 	async function handleSignOut() {
 		try {
 			await auth.signOut()
-			toast.success('Signed out successfully')
+			toast.success(m.profile_signout_success())
 		} catch (error) {
 			console.error('Sign out error:', error)
-			toast.error('Failed to sign out')
+			toast.error(m.profile_signout_error())
 		}
 	}
 	
@@ -128,8 +129,8 @@
 </script>
 
 <svelte:head>
-	<title>{profile?.full_name || profile?.username || 'Profile'} | Threadly</title>
-	<meta name="description" content="{profile?.bio || `${profile?.username}'s profile on Threadly marketplace`}" />
+	<title>{m.profile_page_title({ name: profile?.full_name || profile?.username || 'Profile' })}</title>
+	<meta name="description" content="{profile?.bio || m.profile_meta_description({ name: profile?.username || 'User' })}" />
 </svelte:head>
 
 {#if profile}
@@ -156,7 +157,7 @@
 							}"
 						onclick={() => activeTab = 'listings'}
 					>
-						<span class="block">Listings</span>
+						<span class="block">{m.profile_listings_tab()}</span>
 						<span class="text-xs font-normal opacity-70">{listings.length}</span>
 					</button>
 					<button
@@ -167,7 +168,7 @@
 							}"
 						onclick={() => activeTab = 'reviews'}
 					>
-						<span class="block">Reviews</span>
+						<span class="block">{m.profile_reviews_tab()}</span>
 						<span class="text-xs font-normal opacity-70">{reviews.length}</span>
 					</button>
 					<button
@@ -178,7 +179,7 @@
 							}"
 						onclick={() => activeTab = 'about'}
 					>
-						About
+						{m.profile_about_tab()}
 					</button>
 				</nav>
 			</div>
@@ -198,14 +199,14 @@
 						{:else}
 							<div class="bg-white rounded-xl p-8 text-center shadow-sm">
 								<div class="text-6xl mb-4">🛍️</div>
-								<h3 class="text-lg font-medium text-gray-900 mb-2">No listings yet</h3>
+								<h3 class="text-lg font-medium text-gray-900 mb-2">{m.profile_no_listings_title()}</h3>
 								<p class="text-sm text-gray-600 mb-4">
-									{isOwnProfile ? "Start selling by creating your first listing!" : `${profile.username} hasn't listed any items yet.`}
+									{isOwnProfile ? m.profile_no_listings_own() : m.profile_no_listings_other({ username: profile.username })}
 								</p>
 								{#if isOwnProfile}
 									<Button class="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600">
 										<Package class="w-4 h-4 mr-2" />
-										Create Listing
+										{m.profile_create_listing()}
 									</Button>
 								{/if}
 							</div>
@@ -232,7 +233,7 @@
 														<div class="flex items-center gap-2 mt-1">
 															<RatingStars rating={review.rating} size="sm" />
 															<Badge variant="outline" class="text-xs">
-																Verified
+																{m.profile_verified_badge()}
 															</Badge>
 														</div>
 													</div>
@@ -259,9 +260,9 @@
 						{:else}
 							<div class="bg-white rounded-xl p-8 text-center shadow-sm">
 								<div class="text-6xl mb-4">⭐</div>
-								<h3 class="text-lg font-medium text-gray-900 mb-2">No reviews yet</h3>
+								<h3 class="text-lg font-medium text-gray-900 mb-2">{m.profile_no_reviews_title()}</h3>
 								<p class="text-sm text-gray-600">
-									{isOwnProfile ? "Reviews from buyers will appear here." : `${profile.username} doesn't have any reviews yet.`}
+									{isOwnProfile ? m.profile_no_reviews_own() : m.profile_no_reviews_other({ username: profile.username })}
 								</p>
 							</div>
 						{/if}
@@ -269,44 +270,44 @@
 					{:else if activeTab === 'about'}
 						<!-- About Tab -->
 						<div class="bg-white rounded-xl shadow-sm p-4 md:p-6">
-							<h3 class="text-lg font-semibold text-gray-900 mb-4">About {profile.username}</h3>
+							<h3 class="text-lg font-semibold text-gray-900 mb-4">{m.profile_about_title({ username: profile.username })}</h3>
 							
 							{#if profile.bio}
 								<p class="text-sm text-gray-700 mb-6 leading-relaxed">{profile.bio}</p>
 							{:else}
-								<p class="text-sm text-gray-500 mb-6 italic">No bio added yet.</p>
+								<p class="text-sm text-gray-500 mb-6 italic">{m.profile_bio_empty()}</p>
 							{/if}
 							
 							<div class="space-y-3">
 								<div class="flex justify-between items-center py-3 border-b border-gray-100">
-									<span class="text-sm text-gray-600">Member since</span>
+									<span class="text-sm text-gray-600">{m.profile_member_since()}</span>
 									<span class="text-sm font-medium">{formatDate(profile.member_since)}</span>
 								</div>
 								
 								{#if profile.location}
 									<div class="flex justify-between items-center py-3 border-b border-gray-100">
-										<span class="text-sm text-gray-600">Location</span>
+										<span class="text-sm text-gray-600">{m.profile_location()}</span>
 										<span class="text-sm font-medium">{profile.location}</span>
 									</div>
 								{/if}
 								
 								<div class="flex justify-between items-center py-3 border-b border-gray-100">
-									<span class="text-sm text-gray-600">Response time</span>
+									<span class="text-sm text-gray-600">{m.profile_response_time()}</span>
 									<span class="text-sm font-medium">
-										{profile.response_time_hours < 24 ? `${profile.response_time_hours} hours` : 'Within a day'}
+										{profile.response_time_hours < 24 ? m.profile_response_hours({ hours: profile.response_time_hours }) : m.profile_response_within_day()}
 									</span>
 								</div>
 								
 								{#if profile.total_sales > 0}
 									<div class="flex justify-between items-center py-3 border-b border-gray-100">
-										<span class="text-sm text-gray-600">Total sales</span>
+										<span class="text-sm text-gray-600">{m.profile_total_sales()}</span>
 										<span class="text-sm font-medium">{profile.total_sales.toLocaleString()}</span>
 									</div>
 								{/if}
 								
 								{#if profile.verification_badges?.length > 0}
 									<div class="pt-3">
-										<h4 class="text-sm font-medium text-gray-900 mb-2">Verifications</h4>
+										<h4 class="text-sm font-medium text-gray-900 mb-2">{m.profile_verifications()}</h4>
 										<div class="flex flex-wrap gap-2">
 											{#each profile.verification_badges as badge}
 												<div class="inline-flex items-center gap-1.5 bg-blue-50 text-blue-700 px-3 py-1.5 rounded-full text-xs font-medium">
@@ -332,33 +333,33 @@
 					<!-- Quick Actions -->
 					{#if !isOwnProfile}
 						<div class="bg-white rounded-xl shadow-sm p-4">
-							<h3 class="text-base font-semibold text-gray-900 mb-3">Quick Actions</h3>
+							<h3 class="text-base font-semibold text-gray-900 mb-3">{m.profile_quick_actions()}</h3>
 							<div class="space-y-2">
 								<button 
 									class="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-medium py-2.5 px-4 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 text-sm"
 									onclick={handleMessage}
 								>
 									<MessageCircle class="w-4 h-4" />
-									Send Message
+									{m.profile_send_message()}
 								</button>
 								<button 
 									class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2.5 px-4 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 text-sm"
 								>
 									<Star class="w-4 h-4" />
-									Save Seller
+									{m.profile_save_seller()}
 								</button>
 							</div>
 						</div>
 					{:else}
 						<div class="bg-white rounded-xl shadow-sm p-4">
-							<h3 class="text-base font-semibold text-gray-900 mb-3">Account</h3>
+							<h3 class="text-base font-semibold text-gray-900 mb-3">{m.profile_account()}</h3>
 							<div class="space-y-2">
 								<button 
 									class="w-full bg-red-500 hover:bg-red-600 text-white font-medium py-2.5 px-4 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 text-sm"
 									onclick={handleSignOut}
 								>
 									<LogOut class="w-4 h-4" />
-									Sign Out
+									{m.profile_sign_out()}
 								</button>
 							</div>
 						</div>
@@ -366,12 +367,12 @@
 					
 					<!-- Safety Tips -->
 					<div class="bg-orange-50 rounded-xl p-4 border border-orange-100">
-						<h4 class="text-sm font-semibold text-orange-900 mb-2">Safety Tips</h4>
+						<h4 class="text-sm font-semibold text-orange-900 mb-2">{m.profile_safety_tips()}</h4>
 						<ul class="text-xs text-orange-800 space-y-1">
-							<li>• Meet in safe, public locations</li>
-							<li>• Check item condition before payment</li>
-							<li>• Use secure payment methods</li>
-							<li>• Keep communication on platform</li>
+							<li>• {m.profile_safety_tip_1()}</li>
+							<li>• {m.profile_safety_tip_2()}</li>
+							<li>• {m.profile_safety_tip_3()}</li>
+							<li>• {m.profile_safety_tip_4()}</li>
 						</ul>
 					</div>
 				</div>
@@ -381,13 +382,13 @@
 {:else}
 	<div class="min-h-screen flex items-center justify-center">
 		<div class="text-center">
-			<h1 class="text-2xl font-bold text-gray-900 mb-2">Profile not found</h1>
-			<p class="text-gray-600 mb-4">The user you're looking for doesn't exist.</p>
+			<h1 class="text-2xl font-bold text-gray-900 mb-2">{m.profile_not_found_title()}</h1>
+			<p class="text-gray-600 mb-4">{m.profile_not_found_message()}</p>
 			<button 
 				class="bg-orange-500 hover:bg-orange-600 text-white font-medium py-2 px-4 rounded-lg transition-colors"
 				onclick={() => goto('/')}
 			>
-				Go Home
+				{m.profile_go_home()}
 			</button>
 		</div>
 	</div>

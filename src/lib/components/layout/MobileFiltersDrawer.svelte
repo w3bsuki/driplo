@@ -2,6 +2,7 @@
 	import { X, ChevronRight, Check } from 'lucide-svelte';
 	import { goto } from '$app/navigation';
 	import { cn } from '$lib/utils';
+	import * as m from '$lib/paraglide/messages.js';
 	
 	interface Props {
 		isOpen?: boolean;
@@ -22,32 +23,32 @@
 	
 	// Main categories
 	const categories = [
-		{ slug: 'women', name: 'Women', icon: '👩', count: '2.1k items' },
-		{ slug: 'men', name: 'Men', icon: '👨', count: '1.8k items' },
-		{ slug: 'kids', name: 'Kids', icon: '👶', count: '890 items' },
-		{ slug: 'designer', name: 'Designer', icon: '💎', count: '450 items' },
-		{ slug: 'home', name: 'Home & Living', icon: '🏠', count: '320 items' }
+		{ slug: 'women', name: m.category_women(), icon: '👩', count: m.category_women_count() },
+		{ slug: 'men', name: m.category_men(), icon: '👨', count: m.category_men_count() },
+		{ slug: 'kids', name: m.category_kids(), icon: '👶', count: m.category_kids_count() },
+		{ slug: 'designer', name: m.category_designer(), icon: '💎', count: m.category_designer_count() },
+		{ slug: 'home', name: m.category_home(), icon: '🏠', count: m.category_home_count() }
 	];
 	
 	// Subcategories
 	const subcategories = [
-		{ slug: 'dresses', name: 'Dresses', icon: '👗' },
-		{ slug: 'shoes', name: 'Shoes', icon: '👠' },
-		{ slug: 'bags', name: 'Bags', icon: '👜' },
-		{ slug: 'jackets', name: 'Jackets', icon: '🧥' },
-		{ slug: 'jeans', name: 'Jeans', icon: '👖' },
-		{ slug: 'tops', name: 'Tops', icon: '👚' },
-		{ slug: 'accessories', name: 'Accessories', icon: '⌚' },
-		{ slug: 'jewelry', name: 'Jewelry', icon: '💍' }
+		{ slug: 'dresses', name: m.subcategory_dresses(), icon: '👗' },
+		{ slug: 'shoes', name: m.subcategory_shoes(), icon: '👠' },
+		{ slug: 'bags', name: m.subcategory_bags(), icon: '👜' },
+		{ slug: 'jackets', name: m.subcategory_jackets(), icon: '🧥' },
+		{ slug: 'jeans', name: m.subcategory_jeans(), icon: '👖' },
+		{ slug: 'tops', name: m.subcategory_tops(), icon: '👚' },
+		{ slug: 'accessories', name: m.subcategory_accessories(), icon: '⌚' },
+		{ slug: 'jewelry', name: m.subcategory_jewelry(), icon: '💍' }
 	];
 	
 	// Filter options
 	const priceRanges = [
-		{ label: 'Under £20', value: '0-20' },
-		{ label: '£20-50', value: '20-50' },
-		{ label: '£50-100', value: '50-100' },
-		{ label: '£100-200', value: '100-200' },
-		{ label: '£200+', value: '200-999' }
+		{ label: m.filter_price_under_20(), value: '0-20' },
+		{ label: m.filter_price_20_50(), value: '20-50' },
+		{ label: m.filter_price_50_100(), value: '50-100' },
+		{ label: m.filter_price_100_200(), value: '100-200' },
+		{ label: m.filter_price_200_plus(), value: '200-999' }
 	];
 	
 	const sizes = [
@@ -71,19 +72,19 @@
 	];
 	
 	const conditions = [
-		{ label: 'New with tags', value: 'new' },
-		{ label: 'Like new', value: 'likenew' },
-		{ label: 'Very good', value: 'verygood' },
-		{ label: 'Good', value: 'good' },
-		{ label: 'Fair', value: 'fair' }
+		{ label: m.listing_condition_new(), value: 'new' },
+		{ label: m.listing_condition_like_new(), value: 'likenew' },
+		{ label: m.condition_good(), value: 'verygood' },
+		{ label: m.condition_good(), value: 'good' },
+		{ label: m.condition_fair(), value: 'fair' }
 	];
 	
 	const sortOptions = [
-		{ label: 'Most Recent', value: 'recent', icon: '🆕' },
-		{ label: 'Price: Low to High', value: 'price-low', icon: '📈' },
-		{ label: 'Price: High to Low', value: 'price-high', icon: '📉' },
-		{ label: 'Most Popular', value: 'popular', icon: '🔥' },
-		{ label: 'Ending Soon', value: 'ending', icon: '⏰' }
+		{ label: m.filter_sort_recent(), value: 'recent', icon: '🆕' },
+		{ label: m.filter_sort_price_low(), value: 'price-low', icon: '📈' },
+		{ label: m.filter_sort_price_high(), value: 'price-high', icon: '📉' },
+		{ label: m.filter_sort_popular(), value: 'popular', icon: '🔥' },
+		{ label: m.filter_sort_ending(), value: 'ending', icon: '⏰' }
 	];
 	
 	function selectFilter(type: string, value: string) {
@@ -141,7 +142,7 @@
 		<!-- Header -->
 		<div class="flex items-center justify-between p-3 border-b border-gray-200">
 			<div class="flex items-center gap-2">
-				<h2 class="text-base font-bold text-gray-900">Filters</h2>
+				<h2 class="text-base font-bold text-gray-900">{m.nav_filters()}</h2>
 				{#if activeFilterCount > 0}
 					<span class="bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full">
 						{activeFilterCount}
@@ -154,7 +155,7 @@
 						onclick={clearAllFilters}
 						class="text-xs text-orange-600 hover:text-orange-700 font-medium px-2 py-1 rounded-lg hover:bg-orange-50"
 					>
-						Clear all
+						{m.filter_clear_all()}
 					</button>
 				{/if}
 				<button
@@ -170,7 +171,7 @@
 		<div class="flex-1 overflow-y-auto px-4 py-3 space-y-4">
 			<!-- Categories -->
 			<div>
-				<h3 class="text-sm font-semibold text-gray-900 mb-2">Categories</h3>
+				<h3 class="text-sm font-semibold text-gray-900 mb-2">{m.filter_categories()}</h3>
 				<div class="grid grid-cols-2 gap-2">
 					{#each categories as category}
 						<button
@@ -197,7 +198,7 @@
 			
 			<!-- Subcategories -->
 			<div>
-				<h3 class="text-sm font-semibold text-gray-900 mb-2">What are you looking for?</h3>
+				<h3 class="text-sm font-semibold text-gray-900 mb-2">{m.filter_what_looking_for()}</h3>
 				<div class="grid grid-cols-2 gap-2">
 					{#each subcategories as subcategory}
 						<button
@@ -221,7 +222,7 @@
 			
 			<!-- Price Range -->
 			<div>
-				<h3 class="text-sm font-semibold text-gray-900 mb-2">Price Range</h3>
+				<h3 class="text-sm font-semibold text-gray-900 mb-2">{m.filter_price_range()}</h3>
 				<div class="grid grid-cols-2 gap-2">
 					{#each priceRanges as price}
 						<button
@@ -241,7 +242,7 @@
 			
 			<!-- Size -->
 			<div>
-				<h3 class="text-sm font-semibold text-gray-900 mb-2">Size</h3>
+				<h3 class="text-sm font-semibold text-gray-900 mb-2">{m.filter_size()}</h3>
 				<div class="flex flex-wrap gap-2">
 					{#each sizes as size}
 						<button
@@ -261,7 +262,7 @@
 			
 			<!-- Brand -->
 			<div>
-				<h3 class="text-sm font-semibold text-gray-900 mb-2">Brand</h3>
+				<h3 class="text-sm font-semibold text-gray-900 mb-2">{m.filter_brand()}</h3>
 				<div class="grid grid-cols-2 gap-2">
 					{#each brands as brand}
 						<button
@@ -281,7 +282,7 @@
 			
 			<!-- Condition -->
 			<div>
-				<h3 class="text-sm font-semibold text-gray-900 mb-2">Condition</h3>
+				<h3 class="text-sm font-semibold text-gray-900 mb-2">{m.filter_condition()}</h3>
 				<div class="space-y-2">
 					{#each conditions as condition}
 						<button
@@ -304,7 +305,7 @@
 			
 			<!-- Sort -->
 			<div>
-				<h3 class="text-sm font-semibold text-gray-900 mb-2">Sort by</h3>
+				<h3 class="text-sm font-semibold text-gray-900 mb-2">{m.filter_sort_by()}</h3>
 				<div class="space-y-2">
 					{#each sortOptions as sort}
 						<button
@@ -334,9 +335,9 @@
 				class="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl active:scale-95 text-sm"
 			>
 				{#if activeFilterCount > 0}
-					Apply Filters ({activeFilterCount})
+					{m.filter_apply_count({ count: activeFilterCount })}
 				{:else}
-					Browse All Items
+					{m.filter_browse_all()}
 				{/if}
 			</button>
 		</div>

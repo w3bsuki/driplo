@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Search, Heart, MessageCircle, User, Menu, X, Camera, Home, LogOut } from 'lucide-svelte';
+	import { Search, Heart, MessageCircle, User, Menu, X, Camera, Home, LogOut, ShoppingBag } from 'lucide-svelte';
 	import { Button } from '$lib/components/ui';
 	import { goto } from '$app/navigation';
 	import { cn } from '$lib/utils';
@@ -62,21 +62,28 @@
 	<!-- Main Header -->
 	<div class="container flex h-16 items-center px-4">
 		<!-- Mobile Menu Button (Left) -->
-		<div class="flex md:hidden items-center mr-1">
-			<Button 
-				variant="ghost" 
-				size="icon"
+		<div class="flex md:hidden items-center mr-2">
+			<button
 				onclick={toggleMenu}
-				class="h-11 w-11 hover:bg-orange-50 border-0 rounded-xl transition-colors"
+				class="relative h-10 w-10 flex items-center justify-center rounded-xl hover:bg-gray-50 transition-all duration-200 group active:scale-95"
 				aria-label="Toggle menu"
 				aria-expanded={isMenuOpen}
 			>
-				{#if isMenuOpen}
-					<X class="h-5 w-5 text-orange-600" />
-				{:else}
-					<Menu class="h-5 w-5 text-orange-600" />
-				{/if}
-			</Button>
+				<div class="relative w-5 h-4 flex flex-col justify-between">
+					<span class={cn(
+						"block h-0.5 w-full bg-gray-600 rounded-full transition-all duration-300 origin-left",
+						isMenuOpen ? "rotate-45 translate-x-0.5" : ""
+					)}></span>
+					<span class={cn(
+						"block h-0.5 w-full bg-gray-600 rounded-full transition-all duration-300",
+						isMenuOpen ? "opacity-0 scale-0" : ""
+					)}></span>
+					<span class={cn(
+						"block h-0.5 w-full bg-gray-600 rounded-full transition-all duration-300 origin-left",
+						isMenuOpen ? "-rotate-45 translate-x-0.5" : ""
+					)}></span>
+				</div>
+			</button>
 		</div>
 		
 		<!-- Logo -->
@@ -128,23 +135,27 @@
 		</div>
 
 		<!-- Mobile Actions -->
-		<div class="flex md:hidden items-center gap-2 ml-auto">
-			<a href="/cart" class="relative p-2 hover:bg-orange-50 rounded-lg transition-colors">
-				<span class="text-lg">🛒</span>
+		<div class="flex md:hidden items-center gap-1 ml-auto">
+			<a href="/cart" class="relative p-2.5 hover:bg-gray-50 rounded-xl transition-all duration-200 group">
+				<ShoppingBag class="h-5 w-5 text-gray-600 group-hover:text-orange-600 transition-colors" />
 				<span class="sr-only">{m.header_my_cart()}</span>
+				<!-- Cart Badge -->
+				<div class="absolute -top-0.5 -right-0.5 h-5 w-5 bg-orange-500 rounded-full flex items-center justify-center shadow-sm">
+					<span class="text-[10px] text-white font-semibold">0</span>
+				</div>
 			</a>
-			<a href={$user ? ($profile?.username ? `/profile/${$profile.username}` : '/profile') : '/login'} class="relative hover:bg-orange-50 rounded-full transition-colors group">
+			<a href={$user ? ($profile?.username ? `/profile/${$profile.username}` : '/profile') : '/login'} class="relative p-1 hover:bg-gray-50 rounded-xl transition-all duration-200 group">
 				{#if $user}
 					{#if $profile?.avatar_url}
-						<img src={$profile.avatar_url} alt="Profile" class="h-9 w-9 rounded-full border-2 border-orange-200 group-hover:border-orange-300 transition-colors object-cover" />
+						<img src={$profile.avatar_url} alt="Profile" class="h-8 w-8 rounded-xl border-2 border-gray-200 group-hover:border-orange-300 transition-all object-cover" />
 					{:else}
-						<div class="h-9 w-9 rounded-full bg-gradient-to-br from-orange-400 via-orange-500 to-orange-600 flex items-center justify-center shadow-md border border-orange-300 group-hover:shadow-lg transition-all">
-							<span class="text-white font-semibold text-sm">{($profile?.full_name || $profile?.username || $user.email)?.charAt(0).toUpperCase()}</span>
+						<div class="h-8 w-8 rounded-xl bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center shadow-sm group-hover:shadow-md transition-all">
+							<span class="text-white font-semibold text-xs">{($profile?.full_name || $profile?.username || $user.email)?.charAt(0).toUpperCase()}</span>
 						</div>
 					{/if}
 				{:else}
-					<div class="h-9 w-9 rounded-full border-2 border-orange-200 hover:border-orange-400 bg-white flex items-center justify-center group-hover:bg-orange-50 transition-all shadow-sm hover:shadow-md">
-						<User class="h-5 w-5 text-orange-600" />
+					<div class="h-8 w-8 rounded-xl border-2 border-gray-200 hover:border-orange-300 bg-white flex items-center justify-center group-hover:bg-orange-50 transition-all">
+						<User class="h-4 w-4 text-gray-600 group-hover:text-orange-600 transition-colors" />
 					</div>
 				{/if}
 				<span class="sr-only">{$user ? m.header_my_profile() : m.header_sign_in()}</span>
@@ -179,138 +190,201 @@
 		<!-- Backdrop -->
 		<button 
 			type="button"
-			class="fixed top-0 left-0 right-0 bottom-0 z-[99]" 
-			style="background-color: rgba(0, 0, 0, 0.5);"
+			class="fixed inset-0 z-[99] bg-black/40 backdrop-blur-sm animate-fade-in" 
 			onclick={closeMenu}
 			aria-label="Close menu"
 		></button>
 		
 		<!-- Slide-out Panel -->
-		<div class="fixed top-0 left-0 bottom-0 z-[100] w-72 max-w-[85vw] shadow-2xl border-r border-gray-200" style="background-color: #ffffff !important; opacity: 1 !important;">
+		<div class="fixed top-0 left-0 bottom-0 z-[100] w-80 max-w-[85vw] bg-white shadow-2xl animate-slide-in-left">
 			<div class="flex h-full flex-col">
 				<!-- Header -->
-				<div class="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-					<h2 class="text-lg font-semibold text-gray-900">{m.header_menu()}</h2>
+				<div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+					<div class="flex items-center gap-3">
+						<div class="h-10 w-10 rounded-xl bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center shadow-sm">
+							<span class="text-white font-bold text-lg">D</span>
+						</div>
+						<h2 class="text-lg font-semibold text-gray-900">{m.header_menu()}</h2>
+					</div>
 					<button 
 						onclick={closeMenu}
-						class="h-8 w-8 flex items-center justify-center rounded-lg hover:bg-orange-50 transition-colors"
+						class="h-9 w-9 flex items-center justify-center rounded-xl hover:bg-gray-50 transition-all duration-200 group"
 						aria-label="Close menu"
 					>
-						<X class="h-4 w-4 text-orange-600" />
+						<X class="h-5 w-5 text-gray-400 group-hover:text-gray-600 transition-colors" />
 					</button>
 				</div>
 
 				<!-- Navigation -->
-				<nav class="flex-1 overflow-y-auto px-4 py-6">
+				<nav class="flex-1 overflow-y-auto px-4 py-4">
 					<div class="space-y-1">
 						<a 
 							href="/" 
 							onclick={closeMenu}
-							class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100"
+							class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-gray-700 transition-all duration-200 hover:bg-gray-50 hover:text-gray-900 group"
 						>
-							<Home class="h-4 w-4" />
+							<div class="h-8 w-8 rounded-lg bg-gray-100 flex items-center justify-center group-hover:bg-orange-100 transition-colors">
+								<Home class="h-4 w-4 text-gray-600 group-hover:text-orange-600 transition-colors" />
+							</div>
 							{m.header_home()}
 						</a>
 						<a 
 							href="/browse" 
 							onclick={closeMenu}
-							class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100"
+							class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-gray-700 transition-all duration-200 hover:bg-gray-50 hover:text-gray-900 group"
 						>
-							<Search class="h-4 w-4" />
+							<div class="h-8 w-8 rounded-lg bg-gray-100 flex items-center justify-center group-hover:bg-orange-100 transition-colors">
+								<Search class="h-4 w-4 text-gray-600 group-hover:text-orange-600 transition-colors" />
+							</div>
 							{m.header_browse()}
 						</a>
 						<a 
 							href="/sell" 
 							onclick={closeMenu}
-							class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100"
+							class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-white bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 transition-all duration-200 shadow-sm hover:shadow-md"
 						>
-							<Camera class="h-4 w-4" />
+							<div class="h-8 w-8 rounded-lg bg-white/20 flex items-center justify-center">
+								<Camera class="h-4 w-4 text-white" />
+							</div>
 							{m.header_sell_item()}
 						</a>
 						<a 
 							href="/messages" 
 							onclick={closeMenu}
-							class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100"
+							class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-gray-700 transition-all duration-200 hover:bg-gray-50 hover:text-gray-900 group"
 						>
-							<MessageCircle class="h-4 w-4" />
+							<div class="h-8 w-8 rounded-lg bg-gray-100 flex items-center justify-center group-hover:bg-orange-100 transition-colors">
+								<MessageCircle class="h-4 w-4 text-gray-600 group-hover:text-orange-600 transition-colors" />
+							</div>
 							{m.header_messages()}
 						</a>
 						<a 
-							href={$user ? ($profile?.username ? `/profile/${$profile.username}` : '/profile') : '/login'} 
+							href="/wishlist" 
 							onclick={closeMenu}
-							class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-orange-700 transition-colors hover:bg-orange-50 border border-orange-200 hover:border-orange-300"
+							class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-gray-700 transition-all duration-200 hover:bg-gray-50 hover:text-gray-900 group"
 						>
-							{#if $user}
-								<div class="h-5 w-5 rounded-full bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center">
-									<User class="h-3 w-3 text-white" />
-								</div>
-							{:else}
-								<User class="h-4 w-4 text-orange-600" />
-							{/if}
-							{$user ? m.header_my_profile() : m.header_sign_in()}
-						</a>
-						<a 
-							href="/favorites" 
-							onclick={closeMenu}
-							class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100"
-						>
-							<Heart class="h-4 w-4" />
+							<div class="h-8 w-8 rounded-lg bg-gray-100 flex items-center justify-center group-hover:bg-orange-100 transition-colors">
+								<Heart class="h-4 w-4 text-gray-600 group-hover:text-orange-600 transition-colors" />
+							</div>
 							{m.header_favorites()}
 						</a>
 					</div>
 					
+					<!-- Profile Section -->
+					{#if $user}
+						<div class="mt-6 pt-6 border-t border-gray-100">
+							<div class="px-4 mb-4">
+								<a 
+									href={$profile?.username ? `/profile/${$profile.username}` : '/profile'}
+									onclick={closeMenu}
+									class="flex items-center gap-3 p-3 rounded-xl bg-gray-50 hover:bg-gray-100 transition-all duration-200"
+								>
+									{#if $profile?.avatar_url}
+										<img src={$profile.avatar_url} alt="Profile" class="h-12 w-12 rounded-xl object-cover" />
+									{:else}
+										<div class="h-12 w-12 rounded-xl bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center">
+											<span class="text-white font-semibold text-lg">{($profile?.full_name || $profile?.username || $user.email)?.charAt(0).toUpperCase()}</span>
+										</div>
+									{/if}
+									<div class="flex-1">
+										<p class="text-sm font-semibold text-gray-900">{$profile?.full_name || $profile?.username || 'My Profile'}</p>
+										<p class="text-xs text-gray-500">View profile</p>
+									</div>
+								</a>
+							</div>
+							<div class="space-y-1">
+								<a 
+									href="/profile/settings" 
+									onclick={closeMenu}
+									class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-gray-700 transition-all duration-200 hover:bg-gray-50 hover:text-gray-900 group"
+								>
+									<div class="h-8 w-8 rounded-lg bg-gray-100 flex items-center justify-center group-hover:bg-orange-100 transition-colors">
+										<User class="h-4 w-4 text-gray-600 group-hover:text-orange-600 transition-colors" />
+									</div>
+									{m.header_settings()}
+								</a>
+							</div>
+						</div>
+					{:else}
+						<div class="mt-6 pt-6 border-t border-gray-100 px-4">
+							<a 
+								href="/login"
+								onclick={closeMenu}
+								class="flex items-center justify-center gap-2 w-full py-3 px-4 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium transition-all duration-200"
+							>
+								<User class="h-4 w-4" />
+								{m.header_sign_in()}
+							</a>
+						</div>
+					{/if}
+					
 					<!-- Categories Section -->
 					{#if categories.length > 0}
-						<div class="mt-6 pt-6 border-t border-gray-200">
-							<h3 class="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">{m.header_categories()}</h3>
+						<div class="mt-6 pt-6 border-t border-gray-100">
+							<h3 class="px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">{m.header_categories()}</h3>
 							<div class="space-y-1">
 								{#each categories as category}
 									<a 
 										href="/{category.slug}"
 										onclick={closeMenu}
-										class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100"
+										class="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-medium text-gray-700 transition-all duration-200 hover:bg-gray-50 hover:text-gray-900"
 									>
-										<span class="text-base">{category.icon || '📦'}</span>
+										<span class="text-lg">{category.icon || '📦'}</span>
 										{category.name}
 									</a>
 								{/each}
 							</div>
 						</div>
 					{/if}
-					
-					<div class="mt-6 space-y-1">
-						{#if $user}
-							<a 
-								href="/profile/settings" 
-								onclick={closeMenu}
-								class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-orange-600 transition-colors hover:bg-orange-50 hover:text-orange-700"
-							>
-								<User class="h-4 w-4 text-orange-600" />
-								{m.header_settings()}
-							</a>
-						{/if}
-					</div>
-					
-					<!-- Language Switcher -->
-					<div class="mt-6 pt-6 border-t border-gray-200 px-3">
-						<div class="flex items-center justify-between">
-							<span class="text-sm text-gray-600">Language</span>
-							<LanguageSwitcher />
-						</div>
-					</div>
 				</nav>
 
 				<!-- Footer -->
-				<div class="border-t border-gray-200 px-4 py-4">
-					<button 
-						onclick={() => {closeMenu(); goto('/sell');}}
-						class="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white py-3 px-4 rounded-xl font-medium shadow-md hover:shadow-lg transition-all duration-200 flex items-center justify-center gap-2"
-					>
-						<Camera class="h-4 w-4" />
-						{m.header_sell_item()}
-					</button>
+				<div class="border-t border-gray-100 px-4 py-4 space-y-3">
+					<!-- Language Switcher -->
+					<div class="flex items-center justify-between px-2">
+						<span class="text-xs text-gray-500 font-medium">Language</span>
+						<LanguageSwitcher />
+					</div>
+					
+					{#if $user}
+						<button 
+							onclick={() => {auth.signOut(); closeMenu();}}
+							class="w-full py-2.5 px-4 rounded-xl text-sm font-medium text-gray-600 hover:text-red-600 hover:bg-red-50 transition-all duration-200 flex items-center justify-center gap-2"
+						>
+							<LogOut class="h-4 w-4" />
+							Sign out
+						</button>
+					{/if}
 				</div>
 			</div>
 		</div>
 	{/if}
 </header>
+
+<style>
+	@keyframes fade-in {
+		from {
+			opacity: 0;
+		}
+		to {
+			opacity: 1;
+		}
+	}
+	
+	@keyframes slide-in-left {
+		from {
+			transform: translateX(-100%);
+		}
+		to {
+			transform: translateX(0);
+		}
+	}
+	
+	.animate-fade-in {
+		animation: fade-in 0.2s ease-out;
+	}
+	
+	.animate-slide-in-left {
+		animation: slide-in-left 0.3s ease-out;
+	}
+</style>

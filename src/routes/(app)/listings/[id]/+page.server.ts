@@ -1,7 +1,7 @@
 import { error } from '@sveltejs/kit'
 import type { PageServerLoad } from './$types'
 
-export const load: PageServerLoad = async ({ params, locals: { supabase } }) => {
+export const load: PageServerLoad = async ({ params, locals: { supabase, safeGetSession } }) => {
 
 	const { data: listing, error: listingError } = await supabase
 		.from('listings')
@@ -72,9 +72,25 @@ export const load: PageServerLoad = async ({ params, locals: { supabase } }) => 
 		.neq('id', params.id)
 		.limit(8)
 
+	// Check if current user is following the seller
+	const { session } = await safeGetSession()
+	let isFollowing = false
+	
+	if (session?.user) {
+		const { data: followData } = await supabase
+			.from('user_follows')
+			.select('id')
+			.eq('follower_id', session.user.id)
+			.eq('following_id', listing.seller_id)
+			.single()
+		
+		isFollowing = !!followData
+	}
+
 	return {
 		listing,
 		sellerListings: sellerListings || [],
-		relatedListings: relatedListings || []
+		relatedListings: relatedListings || [],
+		isFollowing
 	}
 }

@@ -16,7 +16,17 @@
       "WebFetch(domain:inlang.com)",
       "WebFetch(domain:leovoon.github.io)",
       "WebFetch(domain:www.npmjs.com)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "WebFetch(domain:www.depop.com)",
+      "WebFetch(domain:www.asos.com)",
+      "WebFetch(domain:www.zara.com)",
+      "WebFetch(domain:www.amazon.com)",
+      "WebFetch(domain:www.ebay.com)",
+      "WebFetch(domain:vinted.co.uk)",
+      "WebFetch(domain:depop.com)",
+      "WebFetch(domain:amazon.com)",
+      "Bash(find:*)",
+      "mcp__supabase__list_tables"
     ],
     "deny": []
   }
